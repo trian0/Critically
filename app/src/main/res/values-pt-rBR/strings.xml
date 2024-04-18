@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Critically</string>
+    <string name="hello">Olá</string>
+    <string name="create_account">Cria uma Conta</string>
+    <string name="welcome">Bem - Vindo</string>
+    <string name="email">Email</string>
+    <string name="first_name">Nome</string>
+    <string name="last_name">Sobrenome</string>
+    <string name="password">Senha</string>
+    <string name="hide_password">Esconder Senha</string>
+    <string name="show_password">Mostrar Senha</string>
+    <string name="terms_and_conditions">Ao continuar, você aceita nossa\u0020</string>
+    <string name="privacy_policy">Política de Privacidade\u0020</string>
+    <string name="and">e\u0020</string>
+    <string name="terms_and_conditions_heading">Termos de Uso</string>
+    <string name="register">Registrar</string>
+    <string name="login">Entrar</string>
+    <string name="or">" Ou "</string>
+    <string name="already_have_account">Já tem uma conta?\u0020</string>
+    <string name="dont_have_account">"Não tem conta ainda?"\u0020</string>
+    <string name="forgot_password">Esqueceu sua senha?</string>
+    <string name="logout">Sair</string>
+</resources>

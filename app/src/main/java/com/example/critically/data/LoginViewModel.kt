@@ -70,6 +70,7 @@ class LoginViewModel : ViewModel() {
 
     private fun login() {
         loginInProgress.value = true
+        showErrorAlertDialog.value = false
 
         val email = loginUIState.value.email
         val password = loginUIState.value.password

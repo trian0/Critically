@@ -10,32 +10,39 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.critically.components.ButtonComponent
 import com.example.critically.components.ClickableLoginTextComponent
 import com.example.critically.components.DividerTextComponent
+import com.example.critically.components.ErrorAlertDialog
 import com.example.critically.components.LogoImageCenter
 import com.example.critically.components.MyTextFieldComponent
-import com.example.critically.components.NormalTextComponent
 import com.example.critically.components.PasswordTextFieldComponent
 import com.example.critically.components.UnderLinedTextComponent
 import com.example.critically.data.LoginUIEvent
 import com.example.critically.data.LoginViewModel
 import com.example.critically.navigation.PostOfficeAppRouter
 import com.example.critically.navigation.Screen
+import com.example.critically.ui.theme.Primary
 import com.example.study.R
+import com.google.firebase.auth.FirebaseAuth
+
+
+
 
 @Composable
 fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
+    val shouldShowDialog = remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Surface(
@@ -44,8 +51,11 @@ fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
                 .background(Color.White)
                 .padding(28.dp)
         ) {
-            Column(modifier = Modifier.fillMaxSize().padding(top = 60.dp)) {
-                LogoImageCenter()
+            Column(modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 60.dp)
+                .background(color = colorResource(R.color.white))) {
+                LogoImageCenter(200.dp)
                 Spacer(modifier = Modifier.height(20.dp))
                 MyTextFieldComponent(
                     labelValue = stringResource(id = R.string.email),
@@ -80,8 +90,14 @@ fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
         }
 
         if (loginViewModel.loginInProgress.value) {
-            CircularProgressIndicator()
+            CircularProgressIndicator(color = Primary)
         }
+
+        if (loginViewModel.showErrorAlertDialog.value) {
+            shouldShowDialog.value = true
+        }
+
+        ErrorAlertDialog(text = stringResource(id = R.string.error_login_message), visibility = shouldShowDialog)
     }
 }
 

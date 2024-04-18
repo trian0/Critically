@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.example.critically.data.rules.Validator
 import com.example.critically.navigation.PostOfficeAppRouter
+import com.example.critically.navigation.Screen
 import com.google.firebase.auth.FirebaseAuth
 
 class LoginViewModel : ViewModel() {
@@ -13,6 +14,8 @@ class LoginViewModel : ViewModel() {
     var allValidationsPassed = mutableStateOf(false)
 
     var loginInProgress = mutableStateOf(false)
+
+    var showErrorAlertDialog = mutableStateOf(false)
 
     fun onEvent(event: LoginUIEvent) {
         when(event) {
@@ -63,11 +66,12 @@ class LoginViewModel : ViewModel() {
             .addOnCompleteListener {
                 if (it.isSuccessful) {
                     loginInProgress.value = false
-                    //PostOfficeAppRouter.navigateTo(Screen.HomeScreen)
+                    PostOfficeAppRouter.navigateTo(Screen.BottomNavigation)
                 }
             }
             .addOnFailureListener {
                 loginInProgress.value = false
+                showErrorAlertDialog.value = true
             }
     }
 

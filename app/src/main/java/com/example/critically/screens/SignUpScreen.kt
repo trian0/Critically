@@ -32,6 +32,7 @@ import com.example.critically.data.SignUpViewModel
 import com.example.critically.data.SignUpUIEvent
 import com.example.critically.navigation.PostOfficeAppRouter
 import com.example.critically.navigation.Screen
+import com.example.critically.ui.theme.Primary
 import com.example.study.R
 
 @Composable
@@ -46,7 +47,7 @@ fun SignUpScreen(
                 .padding(28.dp)
         ) {
             Column(modifier = Modifier.fillMaxSize().padding(top = 60.dp)) {
-                LogoImageCenter()
+                LogoImageCenter(200.dp)
                 Spacer(modifier = Modifier.height(20.dp))
 
                 MyTextFieldComponent(
@@ -106,7 +107,7 @@ fun SignUpScreen(
         }
 
         if (signUpViewModel.signUpInProgress.value) {
-            CircularProgressIndicator()
+            CircularProgressIndicator(color = Primary)
         }
     }
 }

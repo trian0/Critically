@@ -20,4 +20,6 @@
     <string name="dont_have_account">"Don't have an account yet?"\u0020</string>
     <string name="forgot_password">Forgot your password?</string>
     <string name="logout">Logout</string>
+    <string name="error_login_message">Incorrect username or password. Please try again.</string>
+    <string name="try_again">Try Again</string>
 </resources>

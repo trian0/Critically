@@ -21,4 +21,6 @@
     <string name="dont_have_account">"Não tem conta ainda?"\u0020</string>
     <string name="forgot_password">Esqueceu sua senha?</string>
     <string name="logout">Sair</string>
+    <string name="error_login_message">Usuário ou senha incorreto(a). Tente novamente.</string>
+    <string name="try_again">Tente Novamente</string>
 </resources>

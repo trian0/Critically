@@ -9,7 +9,6 @@ import androidx.compose.ui.graphics.Color
 import com.example.critically.navigation.PostOfficeAppRouter
 import com.example.critically.navigation.Screen
 import com.example.critically.screens.BottomNavigation
-import com.example.critically.screens.HomeScreen
 import com.example.critically.screens.SignUpScreen
 import com.example.critically.screens.LoginScreen
 
@@ -23,7 +22,6 @@ fun PostOfficeApp() {
             when(currentState.value) {
                 Screen.LoginScreen -> LoginScreen()
                 Screen.SignUpScreen -> SignUpScreen()
-                Screen.HomeScreen -> HomeScreen()
                 Screen.BottomNavigation -> BottomNavigation()
             }
 

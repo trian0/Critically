@@ -55,7 +55,7 @@ fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
                 .fillMaxSize()
                 .padding(top = 60.dp)
                 .background(color = colorResource(R.color.white))) {
-                LogoImageCenter(200.dp)
+                LogoImageCenter(100.dp)
                 Spacer(modifier = Modifier.height(20.dp))
                 MyTextFieldComponent(
                     labelValue = stringResource(id = R.string.email),
@@ -63,7 +63,8 @@ fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
                     onTextSelected = {
                         loginViewModel.onEvent(LoginUIEvent.EmailChanged(it))
                     },
-                    errorStatus = loginViewModel.loginUIState.value.emailError
+                    errorStatus = loginViewModel.loginUIState.value.emailError,
+                    textError = stringResource(id = R.string.email_error_message)
                 )
                 PasswordTextFieldComponent(
                     labelValue = stringResource(id = R.string.password),

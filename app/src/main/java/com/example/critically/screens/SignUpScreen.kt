@@ -46,8 +46,12 @@ fun SignUpScreen(
                 .background(Color.White)
                 .padding(28.dp)
         ) {
-            Column(modifier = Modifier.fillMaxSize().padding(top = 60.dp)) {
-                LogoImageCenter(200.dp)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 60.dp)
+            ) {
+                LogoImageCenter(100.dp)
                 Spacer(modifier = Modifier.height(20.dp))
 
                 MyTextFieldComponent(
@@ -56,7 +60,8 @@ fun SignUpScreen(
                     onTextSelected = {
                         signUpViewModel.onEvent(SignUpUIEvent.FirstNameChanged(it))
                     },
-                    errorStatus = signUpViewModel.registrationUIState.value.firstNameError
+                    errorStatus = signUpViewModel.registrationUIState.value.firstNameError,
+                    textError = stringResource(id = R.string.first_name_error_message)
                 )
                 MyTextFieldComponent(
                     labelValue = stringResource(id = R.string.last_name),
@@ -64,7 +69,8 @@ fun SignUpScreen(
                     onTextSelected = {
                         signUpViewModel.onEvent(SignUpUIEvent.LastNameChanged(it))
                     },
-                    errorStatus = signUpViewModel.registrationUIState.value.lastNameError
+                    errorStatus = signUpViewModel.registrationUIState.value.lastNameError,
+                    textError = stringResource(id = R.string.last_name_error_message)
                 )
                 MyTextFieldComponent(
                     labelValue = stringResource(id = R.string.email),
@@ -72,7 +78,8 @@ fun SignUpScreen(
                     onTextSelected = {
                         signUpViewModel.onEvent(SignUpUIEvent.EmailChanged(it))
                     },
-                    errorStatus = signUpViewModel.registrationUIState.value.emailError
+                    errorStatus = signUpViewModel.registrationUIState.value.emailError,
+                    textError = stringResource(id = R.string.email_error_message)
                 )
                 PasswordTextFieldComponent(
                     labelValue = stringResource(id = R.string.password),
@@ -81,6 +88,12 @@ fun SignUpScreen(
                         signUpViewModel.onEvent(SignUpUIEvent.PasswordChanged(it))
                     },
                     errorStatus = signUpViewModel.registrationUIState.value.passwordError
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                NormalTextComponent(
+                    value = stringResource(id = R.string.password_error_message),
+                    weight = FontWeight.Normal,
+                    size = 10.sp
                 )
                 CheckboxComponent(
                     onTextSelected = {

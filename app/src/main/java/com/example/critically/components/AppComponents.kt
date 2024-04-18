@@ -19,6 +19,7 @@ import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -32,6 +33,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -85,14 +87,13 @@ fun NormalTextComponent(value: String, weight: FontWeight, size: TextUnit) {
         text = value,
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min = 40.dp),
+            .heightIn(min = 20.dp),
         style = TextStyle(
             fontSize = size,
             fontWeight = weight,
             fontStyle = FontStyle.Normal,
         ),
-        color = TextColor,
-        textAlign = TextAlign.Center
+        color = TextColor
     )
 }
 
@@ -102,8 +103,8 @@ fun MyTextFieldComponent(
     labelValue: String, icon: Painter,
     onTextSelected: (String) -> Unit,
     errorStatus: Boolean = false,
+    textError: String,
 ) {
-
     var textValue by remember {
         mutableStateOf("")
     }
@@ -129,6 +130,20 @@ fun MyTextFieldComponent(
         maxLines = 1,
         leadingIcon = {
             Icon(painter = icon, contentDescription = "")
+        },
+        supportingText = {
+            if (!errorStatus) {
+                Text(
+                    text = textError,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        trailingIcon = {
+            if (!errorStatus) {
+                Icon(Icons.Filled.Error, "error", tint = MaterialTheme.colorScheme.error)
+            }
         },
         isError = !errorStatus
     )
@@ -271,17 +286,13 @@ fun ButtonComponent(value: String, onButtonClicked: () -> Unit, isEnabled: Boole
             .fillMaxWidth()
             .heightIn(48.dp),
         contentPadding = PaddingValues(),
-        colors = ButtonDefaults.buttonColors(Color.Transparent),
+        colors = ButtonDefaults.buttonColors(Primary),
         enabled = isEnabled
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(48.dp)
-                .background(
-                    brush = Brush.horizontalGradient(listOf(Secondary, Primary)),
-                    shape = RoundedCornerShape(50.dp)
-                ),
+                .heightIn(48.dp),
             contentAlignment = Alignment.Center
         ) {
             Text(
@@ -415,7 +426,7 @@ fun ErrorAlertDialog(text: String, visibility: MutableState<Boolean>) {
                 }
             },
             text = {
-                Text( text = text)
+                Text(text = text)
             }
         )
     }
@@ -427,8 +438,12 @@ fun HomeTopBar() {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection).padding(vertical =
-        10.dp),
+        modifier = Modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .padding(
+                vertical =
+                10.dp
+            ),
 
         topBar = {
             CenterAlignedTopAppBar(

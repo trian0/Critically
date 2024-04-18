@@ -22,4 +22,9 @@
     <string name="logout">Logout</string>
     <string name="error_login_message">Incorrect username or password. Please try again.</string>
     <string name="try_again">Try Again</string>
+    <string name="first_name_error_message">First name too short</string>
+    <string name="last_name_error_message">Last name too short</string>
+    <string name="password_error_message">* Must have a minimum of 8 letters *</string>
+    <string name="email_error_message">Fill in the field correctly</string>
+    <string name="privacy_policy_error_message">Acceptance of the terms of service is required</string>
 </resources>

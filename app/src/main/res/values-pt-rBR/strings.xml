@@ -23,4 +23,9 @@
     <string name="logout">Sair</string>
     <string name="error_login_message">Usuário ou senha incorreto(a). Tente novamente.</string>
     <string name="try_again">Tente Novamente</string>
+    <string name="first_name_error_message">Nome muito curto</string>
+    <string name="last_name_error_message">Sobrenome muito curto</string>
+    <string name="password_error_message">* Mínimo de 8 letras *</string>
+    <string name="email_error_message">Preencha o campo corretamente</string>
+    <string name="privacy_policy_error_message">Aceite os termos de serviço para continuar</string>
 </resources>

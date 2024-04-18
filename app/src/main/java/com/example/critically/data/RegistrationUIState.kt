@@ -7,9 +7,9 @@ data class RegistrationUiState (
     var password: String = "",
     var privacyPolicyAccepted: Boolean = false,
 
-    var firstNameError: Boolean = false,
-    var lastNameError: Boolean = false,
-    var emailError: Boolean = false,
-    var passwordError: Boolean = false,
-    var privacyPolicyError: Boolean = false,
+    var firstNameError: Boolean = true,
+    var lastNameError: Boolean = true,
+    var emailError: Boolean = true,
+    var passwordError: Boolean = true,
+    var privacyPolicyError: Boolean = true,
 )

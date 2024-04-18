@@ -7,7 +7,6 @@ import com.google.firebase.auth.FirebaseAuth
 sealed class Screen() {
     data object LoginScreen : Screen()
     data object SignUpScreen : Screen()
-    data object HomeScreen : Screen()
     data object BottomNavigation : Screen()
 }
 

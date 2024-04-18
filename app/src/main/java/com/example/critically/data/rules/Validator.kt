@@ -4,25 +4,25 @@ object Validator {
 
     fun validateFirstName(firstName: String): ValidationResult {
         return ValidationResult(
-            (!firstName.isNullOrEmpty() && firstName.length >= 6)
+            (firstName.isNotEmpty() && firstName.length >= 3)
         )
     }
 
     fun validateLastName(lastName: String): ValidationResult {
         return ValidationResult(
-            (!lastName.isNullOrEmpty() && lastName.length >= 4)
+            (lastName.isNotEmpty() && lastName.length >= 3)
         )
     }
 
     fun validateEmail(email: String): ValidationResult {
         return ValidationResult(
-            (!email.isNullOrEmpty())
+            (email.isNotEmpty() && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches())
         )
     }
 
     fun validatePassword(password: String): ValidationResult {
         return ValidationResult(
-            (!password.isNullOrEmpty() && password.length >= 4)
+            (password.isNotEmpty() && password.length >= 8)
         )
     }
 

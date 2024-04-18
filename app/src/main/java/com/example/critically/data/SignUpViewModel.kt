@@ -2,8 +2,10 @@ package com.example.critically.data
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.example.critically.data.rules.ValidationResult
 import com.example.critically.data.rules.Validator
 import com.example.critically.navigation.PostOfficeAppRouter
+import com.example.critically.navigation.Screen
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 
@@ -15,31 +17,40 @@ class SignUpViewModel : ViewModel() {
 
     var signUpInProgress = mutableStateOf(false)
 
+    private var firstNameResult = ValidationResult()
+    private var lastNameResult = ValidationResult()
+    private var emailResult = ValidationResult()
+    private var passwordResult = ValidationResult()
+    private var privacyPolicyResult = ValidationResult()
+
     fun onEvent(event: SignUpUIEvent) {
-        validateDataWithRules()
         when (event) {
             is SignUpUIEvent.FirstNameChanged -> {
                 registrationUIState.value = registrationUIState.value.copy(
                     firstName = event.firstName
                 )
+                validateFirstName()
             }
 
             is SignUpUIEvent.LastNameChanged -> {
                 registrationUIState.value = registrationUIState.value.copy(
                     lastName = event.lastName
                 )
+                validateLastName()
             }
 
             is SignUpUIEvent.EmailChanged -> {
                 registrationUIState.value = registrationUIState.value.copy(
                     email = event.email
                 )
+                validateEmail()
             }
 
             is SignUpUIEvent.PasswordChanged -> {
                 registrationUIState.value = registrationUIState.value.copy(
                     password = event.password
                 )
+                validatePassword()
             }
 
             is SignUpUIEvent.RegisterButtonClicked -> {
@@ -50,7 +61,10 @@ class SignUpViewModel : ViewModel() {
                 registrationUIState.value = registrationUIState.value.copy(
                     privacyPolicyAccepted = event.status
                 )
+                validatePrivacyPolicy()
             }
+
+            else -> {}
         }
         validateDataWithRules()
     }
@@ -62,31 +76,57 @@ class SignUpViewModel : ViewModel() {
         )
     }
 
-    private fun validateDataWithRules() {
-        val firstNameResult = Validator.validateFirstName(
+    private fun validateFirstName() {
+        firstNameResult = Validator.validateFirstName(
             firstName = registrationUIState.value.firstName
         )
-        val lastNameResult = Validator.validateLastName(
+
+        registrationUIState.value = registrationUIState.value.copy(
+            firstNameError = firstNameResult.status
+        )
+    }
+
+    private fun validateLastName() {
+        lastNameResult = Validator.validateLastName(
             lastName = registrationUIState.value.lastName
         )
-        val emailResult = Validator.validateEmail(
+
+        registrationUIState.value = registrationUIState.value.copy(
+            lastNameError = lastNameResult.status
+        )
+    }
+
+    private fun validateEmail() {
+        emailResult = Validator.validateEmail(
             email = registrationUIState.value.email
         )
-        val passwordResult = Validator.validatePassword(
+
+        registrationUIState.value = registrationUIState.value.copy(
+            emailError = emailResult.status
+        )
+    }
+
+    private fun validatePassword() {
+        passwordResult = Validator.validatePassword(
             password = registrationUIState.value.password
         )
-        val privacyPolicyResult = Validator.validatePrivacyPolicyAcceptance(
+
+        registrationUIState.value = registrationUIState.value.copy(
+            passwordError = passwordResult.status
+        )
+    }
+
+    private fun validatePrivacyPolicy() {
+        privacyPolicyResult = Validator.validatePrivacyPolicyAcceptance(
             statusValue = registrationUIState.value.privacyPolicyAccepted
         )
 
         registrationUIState.value = registrationUIState.value.copy(
-            firstNameError = firstNameResult.status,
-            lastNameError = lastNameResult.status,
-            emailError = emailResult.status,
-            passwordError = passwordResult.status,
-            privacyPolicyError = privacyPolicyResult.status,
+            privacyPolicyError = privacyPolicyResult.status
         )
+    }
 
+    private fun validateDataWithRules() {
         allValidationsPassed.value = firstNameResult.status && lastNameResult.status
                 && emailResult.status && passwordResult.status && privacyPolicyResult.status
     }
@@ -99,7 +139,7 @@ class SignUpViewModel : ViewModel() {
             .addOnCompleteListener {
                 signUpInProgress.value = false
                 if (it.isSuccessful) {
-                    //PostOfficeAppRouter.navigateTo(Screen.HomeScreen)
+                    PostOfficeAppRouter.navigateTo(Screen.BottomNavigation)
                 }
             }
             .addOnFailureListener {
@@ -114,9 +154,7 @@ class SignUpViewModel : ViewModel() {
 
         val authStateListener = AuthStateListener {
             if (it.currentUser == null) {
-                //PostOfficeAppRouter.navigateTo(Screen.LoginScreen)
-            } else {
-
+                PostOfficeAppRouter.navigateTo(Screen.LoginScreen)
             }
         }
 

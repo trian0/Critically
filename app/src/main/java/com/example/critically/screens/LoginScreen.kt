@@ -35,10 +35,6 @@ import com.example.critically.navigation.PostOfficeAppRouter
 import com.example.critically.navigation.Screen
 import com.example.critically.ui.theme.Primary
 import com.example.study.R
-import com.google.firebase.auth.FirebaseAuth
-
-
-
 
 @Composable
 fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {

@@ -24,4 +24,6 @@ object Constants {
             route = "profile"
         )
     )
+
+    const val TMDB_API_KEY = "57aa94fa2db004387caf24757eaccb93"
 }

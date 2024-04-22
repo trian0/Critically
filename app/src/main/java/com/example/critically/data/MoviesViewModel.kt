@@ -21,21 +21,31 @@ class MoviesViewModel(
     private val _showErrorToastChannel = Channel<Boolean>()
     val showErrorToastChannel = _showErrorToastChannel.receiveAsFlow()
 
-    init {
+    private val _isSearching = MutableStateFlow(false)
+    val isSearching = _isSearching.asStateFlow()
+
+    private val _searchText = MutableStateFlow("")
+    val searchText = _searchText.asStateFlow()
+
+    fun searchMovie(text: String) {
+        _searchText.value = text
+        _isSearching.value = true
+
         viewModelScope.launch {
-            moviesRepository.getMoviesList().collectLatest { result ->
+            moviesRepository.getSearchedMoviesList(searchText).collectLatest { result ->
                 when(result) {
                     is Result.Error -> {
                         _showErrorToastChannel.send(true)
+                        _isSearching.value = false
                     }
                     is Result.Success -> {
                         result.data?.let { movies ->
                             _movies.update { movies }
+                            _isSearching.value = false
                         }
                     }
                 }
             }
         }
     }
-
 }

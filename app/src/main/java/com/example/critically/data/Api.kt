@@ -12,6 +12,12 @@ interface Api {
         @Query("api_key") apiKey: String,
     ): MoviesResponse
 
+    @GET("search/movie")
+    suspend fun getSearchMoviesList(
+        @Query("query") query: String,
+        @Query("api_key") apiKey: String,
+    ): MoviesResponse
+
     companion object {
         const val BASE_URL = "https://api.themoviedb.org/3/"
     }

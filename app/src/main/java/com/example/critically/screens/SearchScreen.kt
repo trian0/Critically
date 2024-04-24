@@ -13,10 +13,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,12 +22,12 @@ import androidx.compose.material.Surface
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.StarRate
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -38,20 +35,17 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -61,11 +55,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.critically.RetrofitInstance
-import com.example.critically.components.LogoImageCenter
-import com.example.critically.data.MoviesRepositoryImpl
+import com.example.critically.data.BooksViewModel
+import com.example.critically.data.repos.MoviesRepositoryImpl
 import com.example.critically.data.MoviesViewModel
+import com.example.critically.data.repos.BooksRepositoryImpl
+import com.example.critically.ui.theme.GrayColor
 import com.example.critically.ui.theme.Primary
-import com.example.study.R
 import kotlinx.coroutines.flow.collectLatest
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -74,9 +69,15 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun SearchScreen() {
 
-    val viewModel: MoviesViewModel = viewModel(factory = object : ViewModelProvider.Factory {
+    val movieViewModel: MoviesViewModel = viewModel(factory = object : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return MoviesViewModel(MoviesRepositoryImpl(RetrofitInstance.api)) as T
+            return MoviesViewModel(MoviesRepositoryImpl(RetrofitInstance.apiMovie)) as T
+        }
+    })
+
+    val bookViewModel: BooksViewModel = viewModel(factory = object : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return BooksViewModel(BooksRepositoryImpl(RetrofitInstance.apiBook)) as T
         }
     })
 
@@ -85,13 +86,16 @@ fun SearchScreen() {
             .fillMaxSize()
             .background(Color.White),
     ) {
-        val moviesList = viewModel.movies.collectAsState().value
-        val searchText = viewModel.searchText.collectAsState().value
-        val isSearching = viewModel.isSearching.collectAsState().value
+        val moviesList = movieViewModel.movies.collectAsState().value
+        val booksList = bookViewModel.books.collectAsState().value
+        val searchText = movieViewModel.searchText.collectAsState().value
+        val isSearching = movieViewModel.isSearching.collectAsState().value
         val context = LocalContext.current
 
-        LaunchedEffect(key1 = viewModel.showErrorToastChannel) {
-            viewModel.showErrorToastChannel.collectLatest { show ->
+        bookViewModel.searchBook("vida")
+
+        LaunchedEffect(key1 = movieViewModel.showErrorToastChannel) {
+            movieViewModel.showErrorToastChannel.collectLatest { show ->
                 if (show) {
                     Toast.makeText(
                         context, "Error", Toast.LENGTH_SHORT
@@ -120,7 +124,7 @@ fun SearchScreen() {
                         ) {
                             TextField(
                                 value = searchText,
-                                onValueChange = viewModel::searchMovie,
+                                onValueChange = movieViewModel::searchMovie,
                                 Modifier
                                     .fillMaxWidth()
                                     .height(50.dp)
@@ -260,10 +264,12 @@ fun SearchScreen() {
 
                                                 Spacer(modifier = Modifier.height(30.dp))
 
-                                                Box(
+                                                Row(
                                                     modifier = Modifier
                                                         .padding(bottom = 8.dp)
-                                                        .fillMaxWidth()
+                                                        .fillMaxWidth(),
+                                                    horizontalArrangement = Arrangement.SpaceEvenly,
+                                                    verticalAlignment = Alignment.CenterVertically
                                                 ) {
                                                     Button(
                                                         onClick = { },
@@ -274,10 +280,21 @@ fun SearchScreen() {
                                                             disabledContainerColor = Color.Gray,
                                                         ),
                                                         border = BorderStroke(2.dp, Primary),
-                                                        modifier = Modifier.fillMaxWidth()
                                                     ) {
                                                         Text(text = "Ver Mais")
                                                     }
+
+                                                    Icon(
+                                                        imageVector = Icons.Filled.Flag,
+                                                        contentDescription = "",
+                                                        tint = GrayColor,
+                                                        modifier = Modifier
+                                                            .border(
+                                                                BorderStroke(2.dp, GrayColor),
+                                                                shape = RoundedCornerShape(50.dp)
+                                                            )
+                                                            .padding(8.dp),
+                                                    )
                                                 }
                                             }
                                         }

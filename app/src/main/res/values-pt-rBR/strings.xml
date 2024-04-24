@@ -28,4 +28,8 @@
     <string name="password_error_message">* Mínimo de 8 letras *</string>
     <string name="email_error_message">Preencha o campo corretamente</string>
     <string name="privacy_policy_error_message">Aceite os termos de serviço para continuar</string>
+    <string name="error">Erro!</string>
+    <string name="empty_list_message">Nada encontrado.</string>
+    <string name="release_date_not_informed">Não Informada</string>
+    <string name="see_more">Ver Mais</string>
 </resources>

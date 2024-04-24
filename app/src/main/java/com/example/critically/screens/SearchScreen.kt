@@ -46,6 +46,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -61,6 +62,7 @@ import com.example.critically.data.MoviesViewModel
 import com.example.critically.data.repos.BooksRepositoryImpl
 import com.example.critically.ui.theme.GrayColor
 import com.example.critically.ui.theme.Primary
+import com.example.study.R
 import kotlinx.coroutines.flow.collectLatest
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -98,7 +100,7 @@ fun SearchScreen() {
             movieViewModel.showErrorToastChannel.collectLatest { show ->
                 if (show) {
                     Toast.makeText(
-                        context, "Error", Toast.LENGTH_SHORT
+                        context, context.resources.getText(R.string.error), Toast.LENGTH_SHORT
                     ).show()
                 }
             }
@@ -141,7 +143,7 @@ fun SearchScreen() {
                                 leadingIcon = {
                                     Icon(
                                         imageVector = Icons.Outlined.Search,
-                                        contentDescription = "search icon",
+                                        contentDescription = "",
                                         tint = Primary
                                     )
                                 },
@@ -159,7 +161,7 @@ fun SearchScreen() {
                 }
             } else if (moviesList.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(text = "Nada encontrado.")
+                    Text(text = stringResource(id = R.string.empty_list_message))
                 }
             } else {
                 LazyColumn(modifier = Modifier.padding(innerPadding)) {
@@ -204,7 +206,6 @@ fun SearchScreen() {
                                                 )
                                             }
 
-                                            // Informações na direita da AsyncImage
                                             Column(
                                                 modifier = Modifier
                                                     .weight(1f)
@@ -219,7 +220,6 @@ fun SearchScreen() {
                                                     color = Primary,
                                                 )
                                                 Spacer(modifier = Modifier.height(30.dp))
-                                                // Informações sobre a data de lançamento
                                                 Row {
                                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                                         Icon(
@@ -236,7 +236,7 @@ fun SearchScreen() {
                                                                 )
                                                                 date.year.toString()
                                                             } else {
-                                                                "Não informado"
+                                                                stringResource(id = R.string.release_date_not_informed)
                                                             }
                                                         Text(
                                                             text = releaseDateText,
@@ -246,7 +246,6 @@ fun SearchScreen() {
                                                         )
                                                     }
                                                     Spacer(modifier = Modifier.height(30.dp))
-                                                    // Informação sobre a avaliação do filme
                                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                                         Icon(
                                                             Icons.Filled.StarRate,
@@ -281,7 +280,7 @@ fun SearchScreen() {
                                                         ),
                                                         border = BorderStroke(2.dp, Primary),
                                                     ) {
-                                                        Text(text = "Ver Mais")
+                                                        Text(text = stringResource(id = R.string.see_more))
                                                     }
 
                                                     Icon(

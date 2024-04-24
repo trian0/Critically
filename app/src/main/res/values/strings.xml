@@ -27,4 +27,8 @@
     <string name="password_error_message">* Must have a minimum of 8 letters *</string>
     <string name="email_error_message">Fill in the field correctly</string>
     <string name="privacy_policy_error_message">Acceptance of the terms of service is required</string>
+    <string name="error">Error!</string>
+    <string name="empty_list_message">Nothing found.</string>
+    <string name="release_date_not_informed">Not informed</string>
+    <string name="see_more">See More</string>
 </resources>

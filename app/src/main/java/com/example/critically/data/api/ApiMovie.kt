@@ -1,10 +1,10 @@
-package com.example.critically.data
+package com.example.critically.data.api
 
 import com.example.critically.models.MoviesResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-interface Api {
+interface ApiMovie {
 
     @GET("movie/popular")
     suspend fun getMoviesList(

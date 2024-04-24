@@ -26,4 +26,5 @@ object Constants {
     )
 
     const val TMDB_API_KEY = "57aa94fa2db004387caf24757eaccb93"
+    const val GOOGLE_BOOKS_API_KEY = "AIzaSyAaJPCcsoOTs2aBPB1cbh2caHAx5Z0--K4"
 }

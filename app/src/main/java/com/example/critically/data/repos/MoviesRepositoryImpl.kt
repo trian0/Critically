@@ -1,5 +1,7 @@
-package com.example.critically.data
+package com.example.critically.data.repos
 
+import com.example.critically.data.Result
+import com.example.critically.data.api.ApiMovie
 import com.example.critically.models.Movies
 import com.example.critically.utils.Constants
 import kotlinx.coroutines.flow.Flow
@@ -9,12 +11,12 @@ import retrofit2.HttpException
 import java.io.IOException
 
 class MoviesRepositoryImpl(
-    private val api: Api
+    private val apiMovie: ApiMovie
 ) : MoviesRepository {
     override suspend fun getMoviesList(): Flow<Result<List<Movies>>> {
         return flow {
             val moviesFromApi = try {
-                api.getMoviesList(1, Constants.TMDB_API_KEY)
+                apiMovie.getMoviesList(1, Constants.TMDB_API_KEY)
             } catch (e: IOException) {
                 e.printStackTrace()
                 emit(Result.Error(message = "Error loading movies"))
@@ -36,7 +38,7 @@ class MoviesRepositoryImpl(
     override suspend fun getSearchedMoviesList(movieName: StateFlow<String>): Flow<Result<List<Movies>>> {
         return flow {
             val moviesSearched = try {
-                api.getSearchMoviesList(movieName.value, Constants.TMDB_API_KEY)
+                apiMovie.getSearchMoviesList(movieName.value, Constants.TMDB_API_KEY)
             } catch (e: IOException) {
                 e.printStackTrace()
                 emit(Result.Error(message = "Error loading movies"))

@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Surface
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
@@ -40,12 +41,16 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -61,9 +66,12 @@ import com.example.critically.data.MoviesViewModel
 import com.example.critically.data.repos.BooksRepositoryImpl
 import com.example.critically.ui.theme.GrayColor
 import com.example.critically.ui.theme.Primary
+import com.example.study.R
 import kotlinx.coroutines.flow.collectLatest
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -98,59 +106,124 @@ fun SearchScreen() {
             movieViewModel.showErrorToastChannel.collectLatest { show ->
                 if (show) {
                     Toast.makeText(
-                        context, "Error", Toast.LENGTH_SHORT
+                        context, context.resources.getText(R.string.error), Toast.LENGTH_SHORT
                     ).show()
                 }
             }
         }
 
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+        var filterMovies by remember {
+            mutableStateOf(true)
+        }
+        var filterBooks by remember {
+            mutableStateOf(false)
+        }
 
         Scaffold(
             modifier = Modifier
                 .nestedScroll(scrollBehavior.nestedScrollConnection),
 
             topBar = {
-                CenterAlignedTopAppBar(
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Primary,
-                        scrolledContainerColor = Primary,
-                    ),
-                    title = {
-                        Row(
-                            modifier = Modifier.fillMaxSize(),
-                            horizontalArrangement = Arrangement.Start,
-                            verticalAlignment = Alignment.CenterVertically
+                Column {
+                    CenterAlignedTopAppBar(
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = Primary,
+                            scrolledContainerColor = Primary,
+                        ),
+                        title = {
+                            Row(
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalArrangement = Arrangement.Start,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                TextField(
+                                    value = searchText,
+                                    onValueChange = movieViewModel::searchMovie,
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .height(50.dp)
+                                        .padding(horizontal = 40.dp),
+                                    colors = TextFieldDefaults.textFieldColors(
+                                        backgroundColor = Color.White,
+                                        cursorColor = Primary,
+                                        placeholderColor = Primary,
+                                        textColor = Primary,
+                                        focusedIndicatorColor = Color.Transparent,
+                                        unfocusedIndicatorColor = Color.Transparent,
+                                    ),
+                                    shape = RoundedCornerShape(15.dp),
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = Icons.Outlined.Search,
+                                            contentDescription = "",
+                                            tint = Primary
+                                        )
+                                    },
+                                    textStyle = TextStyle.Default
+                                )
+                            }
+                        },
+                        scrollBehavior = scrollBehavior,
+                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.White),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        Button(
+                            onClick = {
+                                filterMovies = !filterMovies
+                                filterBooks = !filterBooks
+                            },
+                            colors = if (filterMovies) {
+                                ButtonColors(
+                                    containerColor = Primary,
+                                    contentColor = Color.White,
+                                    disabledContainerColor = Color.Gray,
+                                    disabledContentColor = Color.Gray,
+                                )
+                            } else {
+                                ButtonColors(
+                                    containerColor = Color.White,
+                                    contentColor = Primary,
+                                    disabledContainerColor = Color.Gray,
+                                    disabledContentColor = Color.Gray,
+                                )
+                            },
+                            border = BorderStroke(2.dp, Primary)
                         ) {
-                            TextField(
-                                value = searchText,
-                                onValueChange = movieViewModel::searchMovie,
-                                Modifier
-                                    .fillMaxWidth()
-                                    .height(50.dp)
-                                    .padding(horizontal = 40.dp),
-                                colors = TextFieldDefaults.textFieldColors(
-                                    backgroundColor = Color.White,
-                                    cursorColor = Primary,
-                                    placeholderColor = Primary,
-                                    textColor = Primary,
-                                    focusedIndicatorColor = Color.Transparent,
-                                    unfocusedIndicatorColor = Color.Transparent,
-                                ),
-                                shape = RoundedCornerShape(15.dp),
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Outlined.Search,
-                                        contentDescription = "search icon",
-                                        tint = Primary
-                                    )
-                                },
-                                textStyle = TextStyle.Default
-                            )
+                            Text(text = "Filmes")
                         }
-                    },
-                    scrollBehavior = scrollBehavior,
-                )
+
+                        Button(
+                            onClick = {
+                                filterMovies = !filterMovies
+                                filterBooks = !filterBooks
+                            },
+                            colors = if (filterBooks) {
+                                ButtonColors(
+                                    containerColor = Primary,
+                                    contentColor = Color.White,
+                                    disabledContainerColor = Color.Gray,
+                                    disabledContentColor = Color.Gray,
+                                )
+                            } else {
+                                ButtonColors(
+                                    containerColor = Color.White,
+                                    contentColor = Primary,
+                                    disabledContainerColor = Color.Gray,
+                                    disabledContentColor = Color.Gray,
+                                )
+                            },
+                            border = BorderStroke(2.dp, Primary),
+                        ) {
+                            Text(text = "Livros")
+                        }
+                    }
+                }
             },
         ) { innerPadding ->
             if (isSearching) {
@@ -159,7 +232,7 @@ fun SearchScreen() {
                 }
             } else if (moviesList.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(text = "Nada encontrado.")
+                    Text(text = stringResource(id = R.string.empty_list_message))
                 }
             } else {
                 LazyColumn(modifier = Modifier.padding(innerPadding)) {
@@ -204,7 +277,6 @@ fun SearchScreen() {
                                                 )
                                             }
 
-                                            // Informações na direita da AsyncImage
                                             Column(
                                                 modifier = Modifier
                                                     .weight(1f)
@@ -219,7 +291,6 @@ fun SearchScreen() {
                                                     color = Primary,
                                                 )
                                                 Spacer(modifier = Modifier.height(30.dp))
-                                                // Informações sobre a data de lançamento
                                                 Row {
                                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                                         Icon(
@@ -236,7 +307,7 @@ fun SearchScreen() {
                                                                 )
                                                                 date.year.toString()
                                                             } else {
-                                                                "Não informado"
+                                                                stringResource(id = R.string.release_date_not_informed)
                                                             }
                                                         Text(
                                                             text = releaseDateText,
@@ -246,7 +317,6 @@ fun SearchScreen() {
                                                         )
                                                     }
                                                     Spacer(modifier = Modifier.height(30.dp))
-                                                    // Informação sobre a avaliação do filme
                                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                                         Icon(
                                                             Icons.Filled.StarRate,
@@ -281,7 +351,7 @@ fun SearchScreen() {
                                                         ),
                                                         border = BorderStroke(2.dp, Primary),
                                                     ) {
-                                                        Text(text = "Ver Mais")
+                                                        Text(text = stringResource(id = R.string.see_more))
                                                     }
 
                                                     Icon(

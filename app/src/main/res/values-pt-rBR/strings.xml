@@ -32,4 +32,6 @@
     <string name="empty_list_message">Nada encontrado.</string>
     <string name="release_date_not_informed">Não Informada</string>
     <string name="see_more">Ver Mais</string>
+    <string name="search_movies">Filmes</string>
+    <string name="search_books">Livros</string>
 </resources>

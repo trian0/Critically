@@ -18,7 +18,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Surface
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
@@ -44,6 +43,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -61,17 +61,15 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.critically.RetrofitInstance
 import com.example.critically.data.BooksViewModel
-import com.example.critically.data.repos.MoviesRepositoryImpl
 import com.example.critically.data.MoviesViewModel
 import com.example.critically.data.repos.BooksRepositoryImpl
+import com.example.critically.data.repos.MoviesRepositoryImpl
 import com.example.critically.ui.theme.GrayColor
 import com.example.critically.ui.theme.Primary
 import com.example.study.R
 import kotlinx.coroutines.flow.collectLatest
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -195,7 +193,7 @@ fun SearchScreen() {
                             },
                             border = BorderStroke(2.dp, Primary)
                         ) {
-                            Text(text = "Filmes")
+                            Text(text = stringResource(id = R.string.search_movies))
                         }
 
                         Button(
@@ -220,7 +218,7 @@ fun SearchScreen() {
                             },
                             border = BorderStroke(2.dp, Primary),
                         ) {
-                            Text(text = "Livros")
+                            Text(text = stringResource(id = R.string.search_books))
                         }
                     }
                 }

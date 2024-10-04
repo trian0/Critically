@@ -22,6 +22,7 @@ class LoginViewModel : ViewModel() {
     private var passwordResult = ValidationResult()
 
     fun onEvent(event: LoginUIEvent) {
+        showErrorAlertDialog.value = false
         when(event) {
             is LoginUIEvent.EmailChanged -> {
                 loginUIState.value = loginUIState.value.copy(

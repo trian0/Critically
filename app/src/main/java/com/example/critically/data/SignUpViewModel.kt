@@ -147,18 +147,4 @@ class SignUpViewModel : ViewModel() {
             }
     }
 
-    fun logout() {
-        val firebaseAuth = FirebaseAuth.getInstance()
-
-        firebaseAuth.signOut()
-
-        val authStateListener = AuthStateListener {
-            if (it.currentUser == null) {
-                PostOfficeAppRouter.navigateTo(Screen.LoginScreen)
-            }
-        }
-
-        firebaseAuth.addAuthStateListener(authStateListener)
-    }
-
 }

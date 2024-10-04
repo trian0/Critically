@@ -1,26 +1,22 @@
 package com.example.critically.components
 
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
@@ -35,6 +31,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
@@ -49,7 +46,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -97,7 +93,6 @@ fun NormalTextComponent(value: String, weight: FontWeight, size: TextUnit) {
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyTextFieldComponent(
     labelValue: String, icon: Painter,
@@ -115,11 +110,13 @@ fun MyTextFieldComponent(
             .clip(componentShapes.small),
         label = { Text(text = labelValue) },
         value = textValue,
-        colors = TextFieldDefaults.outlinedTextFieldColors(
-            focusedBorderColor = Primary,
+        colors = OutlinedTextFieldDefaults.colors(
             focusedLabelColor = Primary,
             cursorColor = Primary,
-            containerColor = BgColor
+            focusedContainerColor = BgColor,
+            unfocusedContainerColor = BgColor,
+            focusedBorderColor = Primary,
+            unfocusedBorderColor = Primary,
         ),
         onValueChange = {
             textValue = it
@@ -173,11 +170,13 @@ fun PasswordTextFieldComponent(
             .clip(componentShapes.small),
         label = { Text(text = labelValue) },
         value = password,
-        colors = TextFieldDefaults.outlinedTextFieldColors(
-            focusedBorderColor = Primary,
+        colors = OutlinedTextFieldDefaults.colors(
             focusedLabelColor = Primary,
             cursorColor = Primary,
-            containerColor = BgColor
+            focusedContainerColor = BgColor,
+            unfocusedContainerColor = BgColor,
+            focusedBorderColor = Primary,
+            unfocusedBorderColor = Primary,
         ),
         onValueChange = {
             password = it
@@ -457,6 +456,8 @@ fun HomeTopBar() {
             )
         },
     ) { innerPadding ->
+        Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
 
+        }
     }
 }

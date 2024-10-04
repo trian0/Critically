@@ -175,8 +175,8 @@ fun SearchScreen() {
                     ) {
                         Button(
                             onClick = {
-                                filterMovies = !filterMovies
-                                filterBooks = !filterBooks
+                                filterMovies = true
+                                filterBooks = false
                             },
                             colors = if (filterMovies) {
                                 ButtonColors(
@@ -200,8 +200,8 @@ fun SearchScreen() {
 
                         Button(
                             onClick = {
-                                filterMovies = !filterMovies
-                                filterBooks = !filterBooks
+                                filterMovies = false
+                                filterBooks = true
                             },
                             colors = if (filterBooks) {
                                 ButtonColors(
@@ -231,7 +231,7 @@ fun SearchScreen() {
                     CircularProgressIndicator(color = Primary)
                 }
             } else if (moviesList.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Box(modifier = Modifier.fillMaxSize().background(Color.White), contentAlignment = Alignment.Center) {
                     Text(text = stringResource(id = R.string.empty_list_message))
                 }
             } else {
@@ -378,6 +378,11 @@ fun SearchScreen() {
             }
         }
     }
+}
+
+@Composable
+fun MoreInformationsMovie() {
+    
 }
 
 @Preview

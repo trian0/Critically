@@ -28,8 +28,8 @@ import com.example.critically.components.LogoImageCenter
 import com.example.critically.components.MyTextFieldComponent
 import com.example.critically.components.NormalTextComponent
 import com.example.critically.components.PasswordTextFieldComponent
-import com.example.critically.data.SignUpViewModel
 import com.example.critically.data.SignUpUIEvent
+import com.example.critically.data.SignUpViewModel
 import com.example.critically.navigation.PostOfficeAppRouter
 import com.example.critically.navigation.Screen
 import com.example.critically.ui.theme.Primary
@@ -39,84 +39,77 @@ import com.example.study.R
 fun SignUpScreen(
     signUpViewModel: SignUpViewModel = viewModel(),
 ) {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Surface(
+    Box(modifier = Modifier.fillMaxSize().background(Color.White), contentAlignment = Alignment.Center) {
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
-                .padding(28.dp)
+                .padding(top = 88.dp, bottom = 28.dp, start = 28.dp, end = 28.dp)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 60.dp)
-            ) {
-                LogoImageCenter(100.dp)
-                Spacer(modifier = Modifier.height(20.dp))
+            LogoImageCenter(100.dp)
+            Spacer(modifier = Modifier.height(20.dp))
 
-                MyTextFieldComponent(
-                    labelValue = stringResource(id = R.string.first_name),
-                    painterResource(id = R.drawable.profile),
-                    onTextSelected = {
-                        signUpViewModel.onEvent(SignUpUIEvent.FirstNameChanged(it))
-                    },
-                    errorStatus = signUpViewModel.registrationUIState.value.firstNameError,
-                    textError = stringResource(id = R.string.first_name_error_message)
-                )
-                MyTextFieldComponent(
-                    labelValue = stringResource(id = R.string.last_name),
-                    painterResource(id = R.drawable.profile),
-                    onTextSelected = {
-                        signUpViewModel.onEvent(SignUpUIEvent.LastNameChanged(it))
-                    },
-                    errorStatus = signUpViewModel.registrationUIState.value.lastNameError,
-                    textError = stringResource(id = R.string.last_name_error_message)
-                )
-                MyTextFieldComponent(
-                    labelValue = stringResource(id = R.string.email),
-                    painterResource(id = R.drawable.mail),
-                    onTextSelected = {
-                        signUpViewModel.onEvent(SignUpUIEvent.EmailChanged(it))
-                    },
-                    errorStatus = signUpViewModel.registrationUIState.value.emailError,
-                    textError = stringResource(id = R.string.email_error_message)
-                )
-                PasswordTextFieldComponent(
-                    labelValue = stringResource(id = R.string.password),
-                    painterResource(id = R.drawable.lock),
-                    onTextSelected = {
-                        signUpViewModel.onEvent(SignUpUIEvent.PasswordChanged(it))
-                    },
-                    errorStatus = signUpViewModel.registrationUIState.value.passwordError
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                NormalTextComponent(
-                    value = stringResource(id = R.string.password_error_message),
-                    weight = FontWeight.Normal,
-                    size = 10.sp
-                )
-                CheckboxComponent(
-                    onTextSelected = {
-                        //PostOfficeAppRouter.navigateTo(Screen.TermsAndConditionsScreen)
-                    },
-                    onCheckedChange = {
-                        signUpViewModel.onEvent(SignUpUIEvent.PrivacyPolicyCheckboxClicked(it))
-                    }
-                )
-                Spacer(modifier = Modifier.height(40.dp))
-                ButtonComponent(
-                    value = stringResource(id = R.string.register),
-                    onButtonClicked = {
-                        signUpViewModel.onEvent(SignUpUIEvent.RegisterButtonClicked)
-                    },
-                    isEnabled = signUpViewModel.allValidationsPassed.value
-                )
-                Spacer(modifier = Modifier.height(20.dp))
-                DividerTextComponent()
-                ClickableLoginTextComponent(tryingToLogin = false, onTextSelected = {
-                    PostOfficeAppRouter.navigateTo(Screen.LoginScreen)
-                })
-            }
+            MyTextFieldComponent(
+                labelValue = stringResource(id = R.string.first_name),
+                painterResource(id = R.drawable.profile),
+                onTextSelected = {
+                    signUpViewModel.onEvent(SignUpUIEvent.FirstNameChanged(it))
+                },
+                errorStatus = signUpViewModel.registrationUIState.value.firstNameError,
+                textError = stringResource(id = R.string.first_name_error_message)
+            )
+            MyTextFieldComponent(
+                labelValue = stringResource(id = R.string.last_name),
+                painterResource(id = R.drawable.profile),
+                onTextSelected = {
+                    signUpViewModel.onEvent(SignUpUIEvent.LastNameChanged(it))
+                },
+                errorStatus = signUpViewModel.registrationUIState.value.lastNameError,
+                textError = stringResource(id = R.string.last_name_error_message)
+            )
+            MyTextFieldComponent(
+                labelValue = stringResource(id = R.string.email),
+                painterResource(id = R.drawable.mail),
+                onTextSelected = {
+                    signUpViewModel.onEvent(SignUpUIEvent.EmailChanged(it))
+                },
+                errorStatus = signUpViewModel.registrationUIState.value.emailError,
+                textError = stringResource(id = R.string.email_error_message)
+            )
+            PasswordTextFieldComponent(
+                labelValue = stringResource(id = R.string.password),
+                painterResource(id = R.drawable.lock),
+                onTextSelected = {
+                    signUpViewModel.onEvent(SignUpUIEvent.PasswordChanged(it))
+                },
+                errorStatus = signUpViewModel.registrationUIState.value.passwordError
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            NormalTextComponent(
+                value = stringResource(id = R.string.password_error_message),
+                weight = FontWeight.Normal,
+                size = 10.sp
+            )
+            CheckboxComponent(
+                onTextSelected = {
+                    //PostOfficeAppRouter.navigateTo(Screen.TermsAndConditionsScreen)
+                },
+                onCheckedChange = {
+                    signUpViewModel.onEvent(SignUpUIEvent.PrivacyPolicyCheckboxClicked(it))
+                }
+            )
+            Spacer(modifier = Modifier.height(40.dp))
+            ButtonComponent(
+                value = stringResource(id = R.string.register),
+                onButtonClicked = {
+                    signUpViewModel.onEvent(SignUpUIEvent.RegisterButtonClicked)
+                },
+                isEnabled = signUpViewModel.allValidationsPassed.value
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+            DividerTextComponent()
+            ClickableLoginTextComponent(tryingToLogin = false, onTextSelected = {
+                PostOfficeAppRouter.navigateTo(Screen.LoginScreen)
+            })
         }
 
         if (signUpViewModel.signUpInProgress.value) {

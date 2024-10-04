@@ -40,50 +40,52 @@ import com.example.study.R
 fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
     val shouldShowDialog = remember { mutableStateOf(false) }
 
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Surface(
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(horizontal = 28.dp, vertical = 60.dp)
                 .background(Color.White)
-                .padding(28.dp)
         ) {
-            Column(modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 60.dp)
-                .background(color = colorResource(R.color.white))) {
-                LogoImageCenter(100.dp)
-                Spacer(modifier = Modifier.height(20.dp))
-                MyTextFieldComponent(
-                    labelValue = stringResource(id = R.string.email),
-                    painterResource(id = R.drawable.mail),
-                    onTextSelected = {
-                        loginViewModel.onEvent(LoginUIEvent.EmailChanged(it))
-                    },
-                    errorStatus = loginViewModel.loginUIState.value.emailError,
-                    textError = stringResource(id = R.string.email_error_message)
-                )
-                PasswordTextFieldComponent(
-                    labelValue = stringResource(id = R.string.password),
-                    painterResource(id = R.drawable.lock),
-                    onTextSelected = {
-                        loginViewModel.onEvent(LoginUIEvent.PasswordChanged(it))
-                    },
-                    errorStatus = loginViewModel.loginUIState.value.passwordError
-                )
-                Spacer(modifier = Modifier.height(40.dp))
-                UnderLinedTextComponent(value = stringResource(id = R.string.forgot_password))
-                Spacer(modifier = Modifier.height(40.dp))
-                ButtonComponent(value = stringResource(id = R.string.login),
-                    onButtonClicked = {
-                        loginViewModel.onEvent(LoginUIEvent.LoginButtonClicked)
-                    },
-                    isEnabled = loginViewModel.allValidationsPassed.value)
-                Spacer(modifier = Modifier.height(20.dp))
-                DividerTextComponent()
-                ClickableLoginTextComponent(tryingToLogin = true, onTextSelected = {
-                    PostOfficeAppRouter.navigateTo(Screen.SignUpScreen)
-                })
-            }
+            LogoImageCenter(100.dp)
+            Spacer(modifier = Modifier.height(20.dp))
+            MyTextFieldComponent(
+                labelValue = stringResource(id = R.string.email),
+                painterResource(id = R.drawable.mail),
+                onTextSelected = {
+                    loginViewModel.onEvent(LoginUIEvent.EmailChanged(it))
+                },
+                errorStatus = loginViewModel.loginUIState.value.emailError,
+                textError = stringResource(id = R.string.email_error_message)
+            )
+            PasswordTextFieldComponent(
+                labelValue = stringResource(id = R.string.password),
+                painterResource(id = R.drawable.lock),
+                onTextSelected = {
+                    loginViewModel.onEvent(LoginUIEvent.PasswordChanged(it))
+                },
+                errorStatus = loginViewModel.loginUIState.value.passwordError
+            )
+            Spacer(modifier = Modifier.height(40.dp))
+            UnderLinedTextComponent(value = stringResource(id = R.string.forgot_password))
+            Spacer(modifier = Modifier.height(40.dp))
+            ButtonComponent(
+                value = stringResource(id = R.string.login),
+                onButtonClicked = {
+                    loginViewModel.onEvent(LoginUIEvent.LoginButtonClicked)
+                },
+                isEnabled = loginViewModel.allValidationsPassed.value
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+            DividerTextComponent()
+            ClickableLoginTextComponent(tryingToLogin = true, onTextSelected = {
+                PostOfficeAppRouter.navigateTo(Screen.SignUpScreen)
+            })
         }
 
         if (loginViewModel.loginInProgress.value) {
@@ -94,7 +96,10 @@ fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
             shouldShowDialog.value = true
         }
 
-        ErrorAlertDialog(text = stringResource(id = R.string.error_login_message), visibility = shouldShowDialog)
+        ErrorAlertDialog(
+            text = stringResource(id = R.string.error_login_message),
+            visibility = shouldShowDialog
+        )
     }
 }
 

@@ -66,7 +66,7 @@ import com.example.critically.data.repos.BooksRepositoryImpl
 import com.example.critically.data.repos.MoviesRepositoryImpl
 import com.example.critically.ui.theme.GrayColor
 import com.example.critically.ui.theme.Primary
-import com.example.study.R
+import com.example.critically.R
 import kotlinx.coroutines.flow.collectLatest
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter

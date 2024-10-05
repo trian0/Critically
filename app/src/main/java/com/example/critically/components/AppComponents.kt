@@ -1,7 +1,6 @@
 package com.example.critically.components
 
 import android.util.Log
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -34,7 +33,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -69,13 +67,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.critically.R
 import com.example.critically.ui.theme.BgColor
 import com.example.critically.ui.theme.GrayColor
 import com.example.critically.ui.theme.Primary
 import com.example.critically.ui.theme.Secondary
 import com.example.critically.ui.theme.TextColor
 import com.example.critically.ui.theme.componentShapes
-import com.example.study.R
 
 @Composable
 fun NormalTextComponent(value: String, weight: FontWeight, size: TextUnit) {
@@ -456,8 +454,41 @@ fun HomeTopBar() {
             )
         },
     ) { innerPadding ->
-        Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)) {
 
+        }
+    }
+}
+
+@Composable
+fun ButtonExtensionsLogin(onButtonClicked: () -> Unit, image: Painter, text: String) {
+    Button(
+        onClick = {
+            onButtonClicked.invoke()
+        },
+        modifier = Modifier.fillMaxWidth().heightIn(48.dp),
+        colors = ButtonDefaults.buttonColors(BgColor)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = image,
+                contentDescription = null,
+                modifier = Modifier.size(25.dp)
+            )
+            Text(
+                text = text,
+                color = Primary,
+                fontWeight = FontWeight.Bold,
+                fontSize = 15.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .weight(1f)
+            )
         }
     }
 }

@@ -34,4 +34,5 @@
     <string name="see_more">Ver Mais</string>
     <string name="search_movies">Filmes</string>
     <string name="search_books">Livros</string>
+    <string name="btn_login_google">Continue com o google</string>
 </resources>

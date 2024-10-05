@@ -33,7 +33,7 @@ import com.example.critically.data.SignUpViewModel
 import com.example.critically.navigation.PostOfficeAppRouter
 import com.example.critically.navigation.Screen
 import com.example.critically.ui.theme.Primary
-import com.example.study.R
+import com.example.critically.R
 
 @Composable
 fun SignUpScreen(

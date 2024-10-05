@@ -76,18 +76,22 @@ class LoginViewModel : ViewModel() {
         val email = loginUIState.value.email
         val password = loginUIState.value.password
 
-        FirebaseAuth.getInstance()
-            .signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener {
-                if (it.isSuccessful) {
-                    loginInProgress.value = false
-                    PostOfficeAppRouter.navigateTo(Screen.BottomNavigation)
+        try {
+            FirebaseAuth.getInstance()
+                .signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener {
+                    if (it.isSuccessful) {
+                        loginInProgress.value = false
+                        PostOfficeAppRouter.navigateTo(Screen.BottomNavigation)
+                    }
                 }
-            }
-            .addOnFailureListener {
-                loginInProgress.value = false
-                showErrorAlertDialog.value = true
-            }
+                .addOnFailureListener {
+                    loginInProgress.value = false
+                    showErrorAlertDialog.value = true
+                }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
 }

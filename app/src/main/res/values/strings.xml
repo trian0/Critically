@@ -33,4 +33,5 @@
     <string name="see_more">See More</string>
     <string name="search_movies">Movies</string>
     <string name="search_books">Books</string>
+    <string name="btn_login_google">Continue with Google</string>
 </resources>

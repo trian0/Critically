@@ -12,6 +12,7 @@ sealed class Screen() {
 
 object PostOfficeAppRouter {
     private val auth = FirebaseAuth.getInstance()
+
     val currentScreen: MutableState<Screen> = if (auth.currentUser != null)
         mutableStateOf(Screen.BottomNavigation) else mutableStateOf(Screen.LoginScreen)
 

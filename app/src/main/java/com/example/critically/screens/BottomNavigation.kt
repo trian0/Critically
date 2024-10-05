@@ -20,7 +20,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.critically.ui.theme.Primary
 import com.example.critically.utils.Constants
-import com.example.study.R
+import com.example.critically.R
 
 @Composable
 fun BottomNavigation() {

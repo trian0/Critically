@@ -1,5 +1,6 @@
 package com.example.critically.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,20 +9,25 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.credentials.CredentialManager
+import androidx.credentials.GetCredentialRequest
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.critically.BuildConfig
+import com.example.critically.R
 import com.example.critically.components.ButtonComponent
+import com.example.critically.components.ButtonExtensionsLogin
 import com.example.critically.components.ClickableLoginTextComponent
 import com.example.critically.components.DividerTextComponent
 import com.example.critically.components.ErrorAlertDialog
@@ -34,23 +40,36 @@ import com.example.critically.data.LoginViewModel
 import com.example.critically.navigation.PostOfficeAppRouter
 import com.example.critically.navigation.Screen
 import com.example.critically.ui.theme.Primary
-import com.example.study.R
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.firebase.Firebase
+import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.auth
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
     val shouldShowDialog = remember { mutableStateOf(false) }
 
+    val auth = Firebase.auth
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val credentialManager = CredentialManager.create(context)
+    val clientApi = BuildConfig.CLIENT_API
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 28.dp, vertical = 60.dp)
                 .background(Color.White)
+                .align(Alignment.Center),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             LogoImageCenter(100.dp)
             Spacer(modifier = Modifier.height(20.dp))
@@ -80,6 +99,52 @@ fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
                     loginViewModel.onEvent(LoginUIEvent.LoginButtonClicked)
                 },
                 isEnabled = loginViewModel.allValidationsPassed.value
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+            ButtonExtensionsLogin(
+                onButtonClicked = {
+                    scope.launch {
+                        val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
+                            .setFilterByAuthorizedAccounts(true)
+                            .setFilterByAuthorizedAccounts(false)
+                            .setServerClientId(clientApi)
+                            .build()
+
+                        val request = GetCredentialRequest.Builder()
+                            .addCredentialOption(googleIdOption)
+                            .build()
+
+                        try {
+                            val result = credentialManager.getCredential(
+                                context = context,
+                                request = request
+                            )
+
+                            val credential = result.credential
+                            val googleIdTokenCredential = GoogleIdTokenCredential
+                                .createFrom(credential.data)
+                            val googleIdToken = googleIdTokenCredential.idToken
+
+                            val firebaseCredential =
+                                GoogleAuthProvider.getCredential(googleIdToken, null)
+                            auth.signInWithCredential(firebaseCredential)
+                                .addOnCompleteListener { task ->
+                                    if (task.isSuccessful) {
+                                        PostOfficeAppRouter.navigateTo(Screen.BottomNavigation)
+                                    }
+                                }
+                        } catch (e: Exception) {
+                            Toast.makeText(
+                                context,
+                                "Error: ${e.message}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            e.printStackTrace()
+                        }
+                    }
+                },
+                painterResource(R.drawable.google),
+                stringResource(R.string.btn_login_google)
             )
             Spacer(modifier = Modifier.height(20.dp))
             DividerTextComponent()

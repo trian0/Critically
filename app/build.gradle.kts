@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -5,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.study"
+    namespace = "com.example.critically"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.study"
+        applicationId = "com.example.critically"
         minSdk = 31
         targetSdk = 34
         versionCode = 1
@@ -19,6 +21,26 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        val properties = Properties()
+        properties.load(project.rootProject.file("local.properties").inputStream())
+
+        buildConfigField(
+            "String",
+            "CLIENT_API",
+            "\"${properties.getProperty("CLIENT_API")}\""
+        )
+        buildConfigField(
+            "String",
+            "TMDB_API_KEY",
+            "\"${properties.getProperty("TMDB_API_KEY")}\""
+
+        )
+        buildConfigField(
+            "String",
+            "GOOGLE_BOOKS_API_KEY",
+            "\"${properties.getProperty("GOOGLE_BOOKS_API_KEY")}\""
+        )
     }
 
     buildTypes {
@@ -39,6 +61,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -85,4 +108,5 @@ dependencies {
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
+    implementation(libs.play.services.auth)
 }

@@ -63,8 +63,6 @@ class SignUpViewModel : ViewModel() {
                 )
                 validatePrivacyPolicy()
             }
-
-            else -> {}
         }
         validateDataWithRules()
     }

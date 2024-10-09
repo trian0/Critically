@@ -9,16 +9,30 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.credentials.ClearCredentialStateRequest
+import androidx.credentials.CredentialManager
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.critically.components.ButtonComponent
-import com.example.critically.data.ProfileUIEvent
 import com.example.critically.data.ProfileViewModel
+import com.example.critically.navigation.PostOfficeAppRouter
+import com.example.critically.navigation.Screen
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+import kotlinx.coroutines.launch
 
 @Composable
 fun ProfileScreen(profileViewModel: ProfileViewModel = viewModel()) {
+
+    val auth = Firebase.auth
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val credentialManager = CredentialManager.create(context)
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -36,9 +50,14 @@ fun ProfileScreen(profileViewModel: ProfileViewModel = viewModel()) {
         Text(text = "Profile", color = Color.Black)
         ButtonComponent(value = "Sair",
             onButtonClicked = {
-                profileViewModel.onEvent(ProfileUIEvent.LogoutButtonClicked)
+                auth.signOut()
+                scope.launch {
+                    credentialManager.clearCredentialState(
+                        ClearCredentialStateRequest()
+                    )
+                }
+                PostOfficeAppRouter.navigateTo(Screen.LoginScreen)
             },
             isEnabled = true)
-        // Text to Display the current Screen
     }
 }

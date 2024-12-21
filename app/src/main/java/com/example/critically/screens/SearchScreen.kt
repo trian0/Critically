@@ -469,5 +469,3 @@ fun ShowCarouselBooks(booksList: List<Item>, innerPadding: PaddingValues) {
 fun SearchScreenPreview() {
     SearchScreen()
 }
-
-fun Double.format(digits: Int) = "%.${digits}f".format(this)

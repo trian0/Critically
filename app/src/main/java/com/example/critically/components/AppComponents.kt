@@ -454,9 +454,12 @@ fun HomeTopBar() {
             )
         },
     ) { innerPadding ->
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .background(Color.White)
+        ) {
 
         }
     }
@@ -468,7 +471,9 @@ fun ButtonExtensionsLogin(onButtonClicked: () -> Unit, image: Painter, text: Str
         onClick = {
             onButtonClicked.invoke()
         },
-        modifier = Modifier.fillMaxWidth().heightIn(48.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(48.dp),
         colors = ButtonDefaults.buttonColors(BgColor)
     ) {
         Row(

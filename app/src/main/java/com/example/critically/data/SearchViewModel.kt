@@ -87,4 +87,8 @@ class SearchViewModel(
         _books.value = emptyList()
         _isSearching.value = false
     }
+
+    fun updateSearchText(text: String) {
+        _searchText.value = text
+    }
 }

@@ -30,8 +30,10 @@ retrofit = "2.9.0"
 gradle = "8.1.0"
 glide = "4.16.0"
 glideCompose = "1.0.0-alpha.3"
-viewModel = "2.6.1"
+viewModel = "2.8.7"
 coroutines = "1.9.0"
+compose = "1.7.6"
+accompanist = "0.30.1"
 
 [libraries]
 androidx-compose-bom-v20240202 = { module = "androidx.compose:compose-bom", version.ref = "androidxComposeBom" }
@@ -85,6 +87,10 @@ glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "gl
 glide-compose = { group = "com.github.bumptech.glide", name = "compose", version.ref = "glideCompose" }
 coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
 view-model = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "viewModel"}
+compose-ui-util = { group = "androidx.compose.ui", name = "ui-util", version.ref = "compose" }
+accompanist-pager = { group = "com.google.accompanist", name = "accompanist-pager", version.ref = "accompanist" }
+accompanist-pager-indicators = { group = "com.google.accompanist", name = "accompanist-pager-indicators", version.ref = "accompanist" }
+compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "compose" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

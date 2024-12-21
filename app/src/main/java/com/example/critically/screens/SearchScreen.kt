@@ -3,39 +3,33 @@ package com.example.critically.screens
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Surface
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Flag
-import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.StarRate
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -47,19 +41,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.lerp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import coil.size.Scale
 import com.example.critically.R
 import com.example.critically.RetrofitInstance
 import com.example.critically.data.SearchViewModel
@@ -67,11 +67,14 @@ import com.example.critically.data.repos.BooksRepositoryImpl
 import com.example.critically.data.repos.MoviesRepositoryImpl
 import com.example.critically.models.Item
 import com.example.critically.models.Movies
-import com.example.critically.ui.theme.GrayColor
 import com.example.critically.ui.theme.Primary
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -91,6 +94,7 @@ fun SearchScreen() {
             .fillMaxSize()
             .background(Color.White),
     ) {
+        val debounceJob = remember { mutableStateOf<Job?>(null) }
         val moviesList = searchViewModel.movies.collectAsState().value
         val booksList = searchViewModel.books.collectAsState().value
         val searchText = searchViewModel.searchText.collectAsState().value
@@ -135,23 +139,32 @@ fun SearchScreen() {
                                 TextField(
                                     value = searchText,
                                     onValueChange = {
-                                        if (filterMovies) {
-                                            searchViewModel.searchMovie(it)
-                                        } else {
-                                            searchViewModel.searchBook(it)
-                                        }
+                                        searchViewModel.updateSearchText(it)
+                                        debounceJob.value?.cancel()
+                                        debounceJob.value =
+                                            CoroutineScope(Dispatchers.Main).launch {
+                                                delay(300)
+                                                if (filterMovies) {
+                                                    searchViewModel.searchMovie(it)
+                                                } else {
+                                                    searchViewModel.searchBook(it)
+                                                }
+                                            }
                                     },
                                     Modifier
                                         .fillMaxWidth()
                                         .height(50.dp)
                                         .padding(horizontal = 40.dp),
-                                    colors = TextFieldDefaults.textFieldColors(
-                                        backgroundColor = Color.White,
+                                    colors = TextFieldDefaults.colors(
+                                        focusedContainerColor = Color.White,
+                                        unfocusedContainerColor = Color.White,
                                         cursorColor = Primary,
-                                        placeholderColor = Primary,
-                                        textColor = Primary,
+                                        focusedTextColor = Primary,
+                                        unfocusedTextColor = Primary,
                                         focusedIndicatorColor = Color.Transparent,
                                         unfocusedIndicatorColor = Color.Transparent,
+                                        focusedPlaceholderColor = Primary,
+                                        unfocusedPlaceholderColor = Primary,
                                     ),
                                     shape = RoundedCornerShape(15.dp),
                                     leadingIcon = {
@@ -178,6 +191,7 @@ fun SearchScreen() {
                             onClick = {
                                 filterMovies = true
                                 filterBooks = false
+                                searchViewModel.updateSearchText("")
                             },
                             colors = if (filterMovies) {
                                 ButtonColors(
@@ -203,6 +217,7 @@ fun SearchScreen() {
                             onClick = {
                                 filterMovies = false
                                 filterBooks = true
+                                searchViewModel.updateSearchText("")
                             },
                             colors = if (filterBooks) {
                                 ButtonColors(
@@ -228,7 +243,11 @@ fun SearchScreen() {
             },
         ) { innerPadding ->
             if (isSearching) {
-                Box(modifier = Modifier.fillMaxSize().background(Color.White), contentAlignment = Alignment.Center) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.White), contentAlignment = Alignment.Center
+                ) {
                     CircularProgressIndicator(color = Primary)
                 }
             } else if ((moviesList.isEmpty() && filterMovies) || (booksList.isEmpty() && filterBooks)) {
@@ -242,10 +261,10 @@ fun SearchScreen() {
                 }
             } else {
                 if (filterMovies) {
-                    ShowMovies(moviesList, innerPadding)
+                    ShowCarouselMovies(moviesList, innerPadding)
                 }
                 if (filterBooks) {
-                    ShowBooks(booksList, innerPadding)
+                    ShowCarouselBooks(booksList, innerPadding)
                 }
             }
         }
@@ -253,313 +272,196 @@ fun SearchScreen() {
 }
 
 @Composable
-fun ShowBooks(booksList: List<Item>, innerPadding: PaddingValues) {
-    var isLoadingImage by remember { mutableStateOf(true) }
+fun ShowCarouselMovies(moviesList: List<Movies>, innerPadding: PaddingValues) {
+    val pagerState = rememberPagerState(initialPage = 2, pageCount = { moviesList.size })
 
-    LazyColumn(modifier = Modifier.padding(innerPadding)) {
-        items(booksList) { bookItem ->
-            val book = bookItem.volumeInfo
-            val imageLinks = book.imageLinks
-            Box(
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding)
+            .background(Color.White),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        HorizontalPager(
+            state = pagerState,
+            contentPadding = PaddingValues(horizontal = 80.dp),
+            modifier = Modifier
+                .weight(0.8f)
+                .fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) { page ->
+            val pageOffset = (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
+            val movie = moviesList[page]
+
+            Column(
                 modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Card(
+                    shape = RoundedCornerShape(10.dp),
                     modifier = Modifier
-                        .padding(5.dp)
-                        .height(265.dp)
-                        .fillMaxWidth(),
-                    colors = CardColors(
-                        containerColor = Color.White,
-                        contentColor = Color.White,
-                        disabledContainerColor = Color.Gray,
-                        disabledContentColor = Color.Black
-                    ),
-                    border = BorderStroke(5.dp, Primary)
-                ) {
-                    Box(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .padding(10.dp)
-                                    .fillMaxHeight()
-                            ) {
-                                if (isLoadingImage) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.align(Alignment.Center)
-                                    )
-                                }
-                                val url: StringBuilder = StringBuilder(imageLinks.thumbnail)
-                                url.insert(4, "s")
-                                AsyncImage(
-                                    model = url.toString(),
-                                    contentDescription = "",
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .clip(RoundedCornerShape(8.dp)),
-                                    onSuccess = {
-                                        isLoadingImage = false
-                                    }
-                                )
+                        .graphicsLayer {
+                            lerp(
+                                start = 0.85f,
+                                stop = 1f,
+                                fraction = 1f - abs(pageOffset.coerceIn(-1f, 1f))
+                            ).also { scale ->
+                                scaleX = scale
+                                scaleY = scale
                             }
 
-                            Column(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .padding(8.dp)
-                                    .fillMaxSize(),
-                                verticalArrangement = Arrangement.Center,
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(
-                                    text = book.title,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Primary,
-                                )
-                                Spacer(modifier = Modifier.height(30.dp))
-                                Row {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Icon(
-                                            Icons.Filled.Schedule,
-                                            contentDescription = "",
-                                            tint = Primary
-                                        )
-                                        val releaseDateText: String =
-                                            if (book.publishedDate.isNullOrEmpty().not() || book.publishedDate.isNullOrBlank().not()) ({
-                                                val string = book.publishedDate
-                                                if (string != null && string.length > 4) {
-                                                    val date = LocalDate.parse(
-                                                        string,
-                                                        DateTimeFormatter.ISO_DATE)
-                                                    date.year
-                                                } else {
-                                                    string
-                                                }
-                                            }).toString() else {
-                                                stringResource(id = R.string.release_date_not_informed)
-                                            }
-                                        Text(
-                                            text = releaseDateText,
-                                            fontWeight = FontWeight.Bold,
-                                            color = Primary,
-                                            modifier = Modifier.padding(start = 5.dp)
-                                        )
-                                    }
-                                    Spacer(modifier = Modifier.height(30.dp))
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Icon(
-                                            Icons.Filled.StarRate,
-                                            contentDescription = "",
-                                            tint = Color.Yellow
-                                        )
-                                        Text(
-                                            text = book.ratingsCount.format(1),
-                                            fontWeight = FontWeight.Bold,
-                                            color = Primary,
-                                            modifier = Modifier.padding(start = 5.dp)
-                                        )
-                                    }
-                                }
-
-                                Spacer(modifier = Modifier.height(30.dp))
-
-                                Row(
-                                    modifier = Modifier
-                                        .padding(bottom = 8.dp)
-                                        .fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceEvenly,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Button(
-                                        onClick = { },
-                                        colors = ButtonColors(
-                                            containerColor = Primary,
-                                            contentColor = Color.White,
-                                            disabledContentColor = Color.Black,
-                                            disabledContainerColor = Color.Gray,
-                                        ),
-                                        border = BorderStroke(2.dp, Primary),
-                                    ) {
-                                        Text(text = stringResource(id = R.string.see_more))
-                                    }
-
-                                    Icon(
-                                        imageVector = Icons.Filled.Flag,
-                                        contentDescription = "",
-                                        tint = GrayColor,
-                                        modifier = Modifier
-                                            .border(
-                                                BorderStroke(2.dp, GrayColor),
-                                                shape = RoundedCornerShape(50.dp)
-                                            )
-                                            .padding(8.dp),
-                                    )
-                                }
-                            }
+                            alpha = lerp(
+                                start = 0.5f,
+                                stop = 1f,
+                                fraction = 1f - abs(pageOffset.coerceIn(-1f, 1f))
+                            )
                         }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun ShowMovies(moviesList: List<Movies>, innerPadding: PaddingValues) {
-    var isLoadingImage by remember { mutableStateOf(true) }
-
-    LazyColumn(modifier = Modifier.padding(innerPadding)) {
-        items(moviesList) { movie ->
-            if (!movie.poster_path.isNullOrBlank()) {
-                val url = "https://image.tmdb.org/t/p/original${movie.poster_path}"
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                        .aspectRatio(0.7f)
+                        .fillMaxSize()
                 ) {
-                    Card(
+                    val url = "https://image.tmdb.org/t/p/original${movie.poster_path}"
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(url)
+                            .crossfade(true)
+                            .scale(Scale.FILL)
+                            .build(),
+                        contentDescription = null,
                         modifier = Modifier
-                            .padding(5.dp)
-                            .height(265.dp)
-                            .fillMaxWidth(),
-                        colors = CardColors(
-                            containerColor = Color.White,
-                            contentColor = Color.White,
-                            disabledContainerColor = Color.Gray,
-                            disabledContentColor = Color.Black
-                        ),
-                        border = BorderStroke(5.dp, Primary)
-                    ) {
-                        Box(
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            Row(
-                                modifier = Modifier.fillMaxSize()
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .padding(10.dp)
-                                        .fillMaxHeight()
-                                ) {
-                                    AsyncImage(
-                                        model = url,
-                                        contentDescription = "",
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .clip(RoundedCornerShape(8.dp)),
-                                        onSuccess = {
-                                            isLoadingImage = false
-                                        }
-                                    )
-                                }
-
-                                Column(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .padding(8.dp)
-                                        .fillMaxSize(),
-                                    verticalArrangement = Arrangement.Center,
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Text(
-                                        text = movie.title,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Primary,
-                                    )
-                                    Spacer(modifier = Modifier.height(30.dp))
-                                    Row {
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Icon(
-                                                Icons.Filled.Schedule,
-                                                contentDescription = "",
-                                                tint = Primary
-                                            )
-                                            val releaseDateText =
-                                                if (movie.release_date.isNotEmpty() || movie.release_date.isNotBlank()) {
-                                                    val string = movie.release_date
-                                                    val date = LocalDate.parse(
-                                                        string,
-                                                        DateTimeFormatter.ISO_DATE
-                                                    )
-                                                    date.year.toString()
-                                                } else {
-                                                    stringResource(id = R.string.release_date_not_informed)
-                                                }
-                                            Text(
-                                                text = releaseDateText,
-                                                fontWeight = FontWeight.Bold,
-                                                color = Primary,
-                                                modifier = Modifier.padding(start = 5.dp)
-                                            )
-                                        }
-                                        Spacer(modifier = Modifier.height(30.dp))
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Icon(
-                                                Icons.Filled.StarRate,
-                                                contentDescription = "",
-                                                tint = Color.Yellow
-                                            )
-                                            Text(
-                                                text = movie.vote_average.format(1),
-                                                fontWeight = FontWeight.Bold,
-                                                color = Primary,
-                                                modifier = Modifier.padding(start = 5.dp)
-                                            )
-                                        }
-                                    }
-
-                                    Spacer(modifier = Modifier.height(30.dp))
-
-                                    Row(
-                                        modifier = Modifier
-                                            .padding(bottom = 8.dp)
-                                            .fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceEvenly,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Button(
-                                            onClick = { },
-                                            colors = ButtonColors(
-                                                containerColor = Primary,
-                                                contentColor = Color.White,
-                                                disabledContentColor = Color.Black,
-                                                disabledContainerColor = Color.Gray,
-                                            ),
-                                            border = BorderStroke(2.dp, Primary),
-                                        ) {
-                                            Text(text = stringResource(id = R.string.see_more))
-                                        }
-
-                                        Icon(
-                                            imageVector = Icons.Filled.Flag,
-                                            contentDescription = "",
-                                            tint = GrayColor,
-                                            modifier = Modifier
-                                                .border(
-                                                    BorderStroke(2.dp, GrayColor),
-                                                    shape = RoundedCornerShape(50.dp)
-                                                )
-                                                .padding(8.dp),
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
+                            .fillMaxSize()
+                            .weight(1f),
+                        contentScale = ContentScale.Crop,
+                        placeholder = painterResource(id = R.drawable.placeholder),
+                        error = painterResource(id = R.drawable.error_image_generic)
+                    )
                 }
+                Text(
+                    text = movie.title,
+                    style = TextStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    ),
+                    modifier = Modifier
+                        .padding(top = 20.dp)
+                        .graphicsLayer {
+                            lerp(
+                                start = 0.85f,
+                                stop = 1f,
+                                fraction = 1f - abs(pageOffset.coerceIn(-1f, 1f))
+                            ).also { scale ->
+                                scaleX = scale
+                                scaleY = scale
+                            }
+
+                            alpha = lerp(
+                                start = 0.5f,
+                                stop = 1f,
+                                fraction = 1f - abs(pageOffset.coerceIn(-1f, 1f))
+                            )
+                        }
+                )
             }
         }
     }
 }
 
 @Composable
-fun MoreInformationsMovie() {
+fun ShowCarouselBooks(booksList: List<Item>, innerPadding: PaddingValues) {
+    val pagerState = rememberPagerState(initialPage = 2, pageCount = { booksList.size })
 
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding)
+            .background(Color.White),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        HorizontalPager(
+            state = pagerState,
+            contentPadding = PaddingValues(horizontal = 80.dp),
+            modifier = Modifier
+                .weight(0.8f)
+                .fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) { page ->
+            val book = booksList[page].volumeInfo
+            val imageLinks = book.imageLinks
+            val pageOffset = (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Card(
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier
+                        .graphicsLayer {
+                            lerp(
+                                start = 0.85f,
+                                stop = 1f,
+                                fraction = 1f - abs(pageOffset.coerceIn(-1f, 1f))
+                            ).also { scale ->
+                                scaleX = scale
+                                scaleY = scale
+                            }
+
+                            alpha = lerp(
+                                start = 0.5f,
+                                stop = 1f,
+                                fraction = 1f - abs(pageOffset.coerceIn(-1f, 1f))
+                            )
+                        }
+                        .fillMaxWidth(1f)
+                        .aspectRatio(0.7f)
+                ) {
+                    val url: StringBuilder = StringBuilder(imageLinks.thumbnail)
+                    url.insert(4, "s")
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(url.toString())
+                            .crossfade(true)
+                            .scale(Scale.FILL)
+                            .build(),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .weight(1f),
+                        contentScale = ContentScale.Crop,
+                        placeholder = painterResource(id = R.drawable.placeholder),
+                        error = painterResource(id = R.drawable.error_image_generic)
+                    )
+                }
+                Text(
+                    text = book.title,
+                    style = TextStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    ),
+                    modifier = Modifier
+                        .padding(top = 20.dp)
+                        .graphicsLayer {
+                            lerp(
+                                start = 0.85f,
+                                stop = 1f,
+                                fraction = 1f - abs(pageOffset.coerceIn(-1f, 1f))
+                            ).also { scale ->
+                                scaleX = scale
+                                scaleY = scale
+                            }
+
+                            alpha = lerp(
+                                start = 0.5f,
+                                stop = 1f,
+                                fraction = 1f - abs(pageOffset.coerceIn(-1f, 1f))
+                            )
+                        }
+                )
+            }
+        }
+    }
 }
 
 @Preview

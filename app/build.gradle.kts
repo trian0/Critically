@@ -113,4 +113,8 @@ dependencies {
     implementation(libs.glide.compose)
     implementation(libs.coroutines)
     implementation(libs.view.model)
+    implementation(libs.compose.ui.util)
+    implementation(libs.accompanist.pager)
+    implementation(libs.accompanist.pager.indicators)
+    implementation(libs.compose.foundation)
 }

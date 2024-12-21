@@ -1,32 +1,37 @@
 [versions]
 agp = "8.3.2"
-androidxComposeBom = "2024.02.02"
+androidxComposeBom = "2024.12.01"
 androidxJunit = "1.2.1"
 coilCompose = "2.4.0"
-composeBomVersion = "2024.04.01"
+composeBomVersion = "2024.12.01"
 converterGson = "2.9.0"
 coreSplashscreen = "1.0.1"
 credentials = "<latest version>"
 dotenvKotlin = "6.2.2"
 espressoCoreVersion = "3.6.1"
-firebaseBom = "33.3.0"
-googleid = "<latest version>"
+firebaseBom = "33.7.0"
+googleid = "1.1.1"
 googleidVersion = "3.0.0"
-kotlin = "1.9.0"
-coreKtx = "1.12.0"
+kotlin = "2.1.0"
+coreKtx = "1.13.1"
 junit = "4.13.2"
-junitVersion = "1.1.5"
-espressoCore = "3.5.1"
-lifecycleRuntimeKtx = "2.7.0"
-activityCompose = "1.8.2"
-composeBom = "2023.08.00"
+junitVersion = "1.2.1"
+espressoCore = "3.6.1"
+lifecycleRuntimeKtx = "2.8.7"
+activityCompose = "1.9.3"
+composeBom = "2024.12.01"
 loggingInterceptor = "4.10.0"
-material3 = "1.3.0"
-materialIconsExtended = "1.7.2"
-navigationCompose = "2.8.1"
+material3 = "1.3.1"
+materialIconsExtended = "1.7.6"
+navigationCompose = "2.8.5"
 okhttp = "5.0.0-alpha.2"
-playServicesAuth = "21.2.0"
+playServicesAuth = "21.3.0"
 retrofit = "2.9.0"
+gradle = "8.1.0"
+glide = "4.16.0"
+glideCompose = "1.0.0-alpha.3"
+viewModel = "2.6.1"
+coroutines = "1.9.0"
 
 [libraries]
 androidx-compose-bom-v20240202 = { module = "androidx.compose:compose-bom", version.ref = "androidxComposeBom" }
@@ -75,6 +80,11 @@ ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
 ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
 ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+build-gradle = { group = "com.android.tools.build", name = "build-gradle", version.ref = "gradle" }
+glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
+glide-compose = { group = "com.github.bumptech.glide", name = "compose", version.ref = "glideCompose" }
+coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
+view-model = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "viewModel"}
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

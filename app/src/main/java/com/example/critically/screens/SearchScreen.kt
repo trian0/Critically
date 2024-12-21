@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -59,14 +60,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.example.critically.R
 import com.example.critically.RetrofitInstance
-import com.example.critically.data.BooksViewModel
-import com.example.critically.data.MoviesViewModel
+import com.example.critically.data.SearchViewModel
 import com.example.critically.data.repos.BooksRepositoryImpl
 import com.example.critically.data.repos.MoviesRepositoryImpl
+import com.example.critically.models.Item
+import com.example.critically.models.Movies
 import com.example.critically.ui.theme.GrayColor
 import com.example.critically.ui.theme.Primary
-import com.example.critically.R
 import kotlinx.coroutines.flow.collectLatest
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -75,15 +77,12 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun SearchScreen() {
 
-    val movieViewModel: MoviesViewModel = viewModel(factory = object : ViewModelProvider.Factory {
+    val searchViewModel: SearchViewModel = viewModel(factory = object : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return MoviesViewModel(MoviesRepositoryImpl(RetrofitInstance.apiMovie)) as T
-        }
-    })
-
-    val bookViewModel: BooksViewModel = viewModel(factory = object : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return BooksViewModel(BooksRepositoryImpl(RetrofitInstance.apiBook)) as T
+            return SearchViewModel(
+                MoviesRepositoryImpl(RetrofitInstance.apiMovie),
+                BooksRepositoryImpl(RetrofitInstance.apiBook)
+            ) as T
         }
     })
 
@@ -92,16 +91,14 @@ fun SearchScreen() {
             .fillMaxSize()
             .background(Color.White),
     ) {
-        val moviesList = movieViewModel.movies.collectAsState().value
-        val booksList = bookViewModel.books.collectAsState().value
-        val searchText = movieViewModel.searchText.collectAsState().value
-        val isSearching = movieViewModel.isSearching.collectAsState().value
+        val moviesList = searchViewModel.movies.collectAsState().value
+        val booksList = searchViewModel.books.collectAsState().value
+        val searchText = searchViewModel.searchText.collectAsState().value
+        val isSearching = searchViewModel.isSearching.collectAsState().value
         val context = LocalContext.current
 
-        bookViewModel.searchBook("vida")
-
-        LaunchedEffect(key1 = movieViewModel.showErrorToastChannel) {
-            movieViewModel.showErrorToastChannel.collectLatest { show ->
+        LaunchedEffect(key1 = searchViewModel.showErrorToastChannel) {
+            searchViewModel.showErrorToastChannel.collectLatest { show ->
                 if (show) {
                     Toast.makeText(
                         context, context.resources.getText(R.string.error), Toast.LENGTH_SHORT
@@ -137,7 +134,13 @@ fun SearchScreen() {
                             ) {
                                 TextField(
                                     value = searchText,
-                                    onValueChange = movieViewModel::searchMovie,
+                                    onValueChange = {
+                                        if (filterMovies) {
+                                            searchViewModel.searchMovie(it)
+                                        } else {
+                                            searchViewModel.searchBook(it)
+                                        }
+                                    },
                                     Modifier
                                         .fillMaxWidth()
                                         .height(50.dp)
@@ -225,151 +228,327 @@ fun SearchScreen() {
             },
         ) { innerPadding ->
             if (isSearching) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Box(modifier = Modifier.fillMaxSize().background(Color.White), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(color = Primary)
                 }
-            } else if (moviesList.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize().background(Color.White), contentAlignment = Alignment.Center) {
+            } else if ((moviesList.isEmpty() && filterMovies) || (booksList.isEmpty() && filterBooks)) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.White),
+                    contentAlignment = Alignment.Center
+                ) {
                     Text(text = stringResource(id = R.string.empty_list_message))
                 }
             } else {
-                LazyColumn(modifier = Modifier.padding(innerPadding)) {
-                    items(moviesList) { movie ->
-                        if (!movie.poster_path.isNullOrBlank()) {
-                            val url = "https://image.tmdb.org/t/p/original${movie.poster_path}"
+                if (filterMovies) {
+                    ShowMovies(moviesList, innerPadding)
+                }
+                if (filterBooks) {
+                    ShowBooks(booksList, innerPadding)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ShowBooks(booksList: List<Item>, innerPadding: PaddingValues) {
+    var isLoadingImage by remember { mutableStateOf(true) }
+
+    LazyColumn(modifier = Modifier.padding(innerPadding)) {
+        items(booksList) { bookItem ->
+            val book = bookItem.volumeInfo
+            val imageLinks = book.imageLinks
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Card(
+                    modifier = Modifier
+                        .padding(5.dp)
+                        .height(265.dp)
+                        .fillMaxWidth(),
+                    colors = CardColors(
+                        containerColor = Color.White,
+                        contentColor = Color.White,
+                        disabledContainerColor = Color.Gray,
+                        disabledContentColor = Color.Black
+                    ),
+                    border = BorderStroke(5.dp, Primary)
+                ) {
+                    Box(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxSize()
+                        ) {
                             Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(10.dp)
+                                    .fillMaxHeight()
                             ) {
-                                Card(
+                                if (isLoadingImage) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.align(Alignment.Center)
+                                    )
+                                }
+                                val url: StringBuilder = StringBuilder(imageLinks.thumbnail)
+                                url.insert(4, "s")
+                                AsyncImage(
+                                    model = url.toString(),
+                                    contentDescription = "",
                                     modifier = Modifier
-                                        .padding(5.dp)
-                                        .height(265.dp)
+                                        .fillMaxSize()
+                                        .clip(RoundedCornerShape(8.dp)),
+                                    onSuccess = {
+                                        isLoadingImage = false
+                                    }
+                                )
+                            }
+
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(8.dp)
+                                    .fillMaxSize(),
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = book.title,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Primary,
+                                )
+                                Spacer(modifier = Modifier.height(30.dp))
+                                Row {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            Icons.Filled.Schedule,
+                                            contentDescription = "",
+                                            tint = Primary
+                                        )
+                                        val releaseDateText: String =
+                                            if (book.publishedDate.isNullOrEmpty().not() || book.publishedDate.isNullOrBlank().not()) ({
+                                                val string = book.publishedDate
+                                                if (string != null && string.length > 4) {
+                                                    val date = LocalDate.parse(
+                                                        string,
+                                                        DateTimeFormatter.ISO_DATE)
+                                                    date.year
+                                                } else {
+                                                    string
+                                                }
+                                            }).toString() else {
+                                                stringResource(id = R.string.release_date_not_informed)
+                                            }
+                                        Text(
+                                            text = releaseDateText,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Primary,
+                                            modifier = Modifier.padding(start = 5.dp)
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.height(30.dp))
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            Icons.Filled.StarRate,
+                                            contentDescription = "",
+                                            tint = Color.Yellow
+                                        )
+                                        Text(
+                                            text = book.ratingsCount.format(1),
+                                            fontWeight = FontWeight.Bold,
+                                            color = Primary,
+                                            modifier = Modifier.padding(start = 5.dp)
+                                        )
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(30.dp))
+
+                                Row(
+                                    modifier = Modifier
+                                        .padding(bottom = 8.dp)
                                         .fillMaxWidth(),
-                                    colors = CardColors(
-                                        containerColor = Color.White,
-                                        contentColor = Color.White,
-                                        disabledContainerColor = Color.Gray,
-                                        disabledContentColor = Color.Black
-                                    ),
-                                    border = BorderStroke(5.dp, Primary)
+                                    horizontalArrangement = Arrangement.SpaceEvenly,
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Box(
-                                        modifier = Modifier.fillMaxSize()
+                                    Button(
+                                        onClick = { },
+                                        colors = ButtonColors(
+                                            containerColor = Primary,
+                                            contentColor = Color.White,
+                                            disabledContentColor = Color.Black,
+                                            disabledContainerColor = Color.Gray,
+                                        ),
+                                        border = BorderStroke(2.dp, Primary),
                                     ) {
-                                        Row(
-                                            modifier = Modifier.fillMaxSize()
-                                        ) {
-                                            Box(
-                                                modifier = Modifier
-                                                    .weight(1f)
-                                                    .padding(10.dp)
-                                                    .fillMaxHeight()
-                                            ) {
-                                                AsyncImage(
-                                                    model = url,
-                                                    contentDescription = "",
-                                                    modifier = Modifier
-                                                        .fillMaxSize()
-                                                        .clip(RoundedCornerShape(8.dp)),
-                                                )
-                                            }
+                                        Text(text = stringResource(id = R.string.see_more))
+                                    }
 
-                                            Column(
-                                                modifier = Modifier
-                                                    .weight(1f)
-                                                    .padding(8.dp)
-                                                    .fillMaxSize(),
-                                                verticalArrangement = Arrangement.Center,
-                                                horizontalAlignment = Alignment.CenterHorizontally
-                                            ) {
-                                                Text(
-                                                    text = movie.title,
-                                                    fontWeight = FontWeight.Bold,
-                                                    color = Primary,
-                                                )
-                                                Spacer(modifier = Modifier.height(30.dp))
-                                                Row {
-                                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                                        Icon(
-                                                            Icons.Filled.Schedule,
-                                                            contentDescription = "",
-                                                            tint = Primary
-                                                        )
-                                                        val releaseDateText =
-                                                            if (movie.release_date.isNotEmpty() || movie.release_date.isNotBlank()) {
-                                                                val string = movie.release_date
-                                                                val date = LocalDate.parse(
-                                                                    string,
-                                                                    DateTimeFormatter.ISO_DATE
-                                                                )
-                                                                date.year.toString()
-                                                            } else {
-                                                                stringResource(id = R.string.release_date_not_informed)
-                                                            }
-                                                        Text(
-                                                            text = releaseDateText,
-                                                            fontWeight = FontWeight.Bold,
-                                                            color = Primary,
-                                                            modifier = Modifier.padding(start = 5.dp)
-                                                        )
-                                                    }
-                                                    Spacer(modifier = Modifier.height(30.dp))
-                                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                                        Icon(
-                                                            Icons.Filled.StarRate,
-                                                            contentDescription = "",
-                                                            tint = Color.Yellow
-                                                        )
-                                                        Text(
-                                                            text = movie.vote_average.format(1),
-                                                            fontWeight = FontWeight.Bold,
-                                                            color = Primary,
-                                                            modifier = Modifier.padding(start = 5.dp)
-                                                        )
-                                                    }
-                                                }
+                                    Icon(
+                                        imageVector = Icons.Filled.Flag,
+                                        contentDescription = "",
+                                        tint = GrayColor,
+                                        modifier = Modifier
+                                            .border(
+                                                BorderStroke(2.dp, GrayColor),
+                                                shape = RoundedCornerShape(50.dp)
+                                            )
+                                            .padding(8.dp),
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 
-                                                Spacer(modifier = Modifier.height(30.dp))
+@Composable
+fun ShowMovies(moviesList: List<Movies>, innerPadding: PaddingValues) {
+    var isLoadingImage by remember { mutableStateOf(true) }
 
-                                                Row(
-                                                    modifier = Modifier
-                                                        .padding(bottom = 8.dp)
-                                                        .fillMaxWidth(),
-                                                    horizontalArrangement = Arrangement.SpaceEvenly,
-                                                    verticalAlignment = Alignment.CenterVertically
-                                                ) {
-                                                    Button(
-                                                        onClick = { },
-                                                        colors = ButtonColors(
-                                                            containerColor = Primary,
-                                                            contentColor = Color.White,
-                                                            disabledContentColor = Color.Black,
-                                                            disabledContainerColor = Color.Gray,
-                                                        ),
-                                                        border = BorderStroke(2.dp, Primary),
-                                                    ) {
-                                                        Text(text = stringResource(id = R.string.see_more))
-                                                    }
-
-                                                    Icon(
-                                                        imageVector = Icons.Filled.Flag,
-                                                        contentDescription = "",
-                                                        tint = GrayColor,
-                                                        modifier = Modifier
-                                                            .border(
-                                                                BorderStroke(2.dp, GrayColor),
-                                                                shape = RoundedCornerShape(50.dp)
-                                                            )
-                                                            .padding(8.dp),
-                                                    )
-                                                }
-                                            }
+    LazyColumn(modifier = Modifier.padding(innerPadding)) {
+        items(moviesList) { movie ->
+            if (!movie.poster_path.isNullOrBlank()) {
+                val url = "https://image.tmdb.org/t/p/original${movie.poster_path}"
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Card(
+                        modifier = Modifier
+                            .padding(5.dp)
+                            .height(265.dp)
+                            .fillMaxWidth(),
+                        colors = CardColors(
+                            containerColor = Color.White,
+                            contentColor = Color.White,
+                            disabledContainerColor = Color.Gray,
+                            disabledContentColor = Color.Black
+                        ),
+                        border = BorderStroke(5.dp, Primary)
+                    ) {
+                        Box(
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .padding(10.dp)
+                                        .fillMaxHeight()
+                                ) {
+                                    AsyncImage(
+                                        model = url,
+                                        contentDescription = "",
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .clip(RoundedCornerShape(8.dp)),
+                                        onSuccess = {
+                                            isLoadingImage = false
                                         }
+                                    )
+                                }
+
+                                Column(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .padding(8.dp)
+                                        .fillMaxSize(),
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text(
+                                        text = movie.title,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Primary,
+                                    )
+                                    Spacer(modifier = Modifier.height(30.dp))
+                                    Row {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Icon(
+                                                Icons.Filled.Schedule,
+                                                contentDescription = "",
+                                                tint = Primary
+                                            )
+                                            val releaseDateText =
+                                                if (movie.release_date.isNotEmpty() || movie.release_date.isNotBlank()) {
+                                                    val string = movie.release_date
+                                                    val date = LocalDate.parse(
+                                                        string,
+                                                        DateTimeFormatter.ISO_DATE
+                                                    )
+                                                    date.year.toString()
+                                                } else {
+                                                    stringResource(id = R.string.release_date_not_informed)
+                                                }
+                                            Text(
+                                                text = releaseDateText,
+                                                fontWeight = FontWeight.Bold,
+                                                color = Primary,
+                                                modifier = Modifier.padding(start = 5.dp)
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.height(30.dp))
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Icon(
+                                                Icons.Filled.StarRate,
+                                                contentDescription = "",
+                                                tint = Color.Yellow
+                                            )
+                                            Text(
+                                                text = movie.vote_average.format(1),
+                                                fontWeight = FontWeight.Bold,
+                                                color = Primary,
+                                                modifier = Modifier.padding(start = 5.dp)
+                                            )
+                                        }
+                                    }
+
+                                    Spacer(modifier = Modifier.height(30.dp))
+
+                                    Row(
+                                        modifier = Modifier
+                                            .padding(bottom = 8.dp)
+                                            .fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceEvenly,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Button(
+                                            onClick = { },
+                                            colors = ButtonColors(
+                                                containerColor = Primary,
+                                                contentColor = Color.White,
+                                                disabledContentColor = Color.Black,
+                                                disabledContainerColor = Color.Gray,
+                                            ),
+                                            border = BorderStroke(2.dp, Primary),
+                                        ) {
+                                            Text(text = stringResource(id = R.string.see_more))
+                                        }
+
+                                        Icon(
+                                            imageVector = Icons.Filled.Flag,
+                                            contentDescription = "",
+                                            tint = GrayColor,
+                                            modifier = Modifier
+                                                .border(
+                                                    BorderStroke(2.dp, GrayColor),
+                                                    shape = RoundedCornerShape(50.dp)
+                                                )
+                                                .padding(8.dp),
+                                        )
                                     }
                                 }
                             }
-
                         }
                     }
                 }
@@ -380,7 +559,7 @@ fun SearchScreen() {
 
 @Composable
 fun MoreInformationsMovie() {
-    
+
 }
 
 @Preview

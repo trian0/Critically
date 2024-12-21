@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.critically"
-        minSdk = 31
+        minSdk = 30
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -109,4 +109,8 @@ dependencies {
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
     implementation(libs.play.services.auth)
+    implementation(libs.glide)
+    implementation(libs.glide.compose)
+    implementation(libs.coroutines)
+    implementation(libs.view.model)
 }

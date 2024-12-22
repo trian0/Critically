@@ -45,6 +45,7 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.Firebase
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.launch
 
 @Composable
@@ -134,6 +135,8 @@ fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
                                     }
                                 }
                         } catch (e: Exception) {
+                            FirebaseCrashlytics.getInstance().recordException(e)
+                            FirebaseCrashlytics.getInstance().sendUnsentReports()
                             Toast.makeText(
                                 context,
                                 "Error: ${e.message}",

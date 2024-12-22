@@ -67,6 +67,8 @@ import com.example.critically.data.repos.BooksRepositoryImpl
 import com.example.critically.data.repos.MoviesRepositoryImpl
 import com.example.critically.models.Item
 import com.example.critically.models.Movies
+import com.example.critically.navigation.PostOfficeAppRouter
+import com.example.critically.navigation.Screen
 import com.example.critically.ui.theme.Primary
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -289,7 +291,7 @@ fun ShowCarouselMovies(moviesList: List<Movies>, innerPadding: PaddingValues) {
             modifier = Modifier
                 .weight(0.8f)
                 .fillMaxSize(),
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = Alignment.CenterVertically
         ) { page ->
             val pageOffset = (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
             val movie = moviesList[page]
@@ -319,7 +321,10 @@ fun ShowCarouselMovies(moviesList: List<Movies>, innerPadding: PaddingValues) {
                             )
                         }
                         .aspectRatio(0.7f)
-                        .fillMaxSize()
+                        .fillMaxSize(),
+                    onClick = {
+                        PostOfficeAppRouter.navigateTo(Screen.MovieDetailScreen(movie))
+                    }
                 ) {
                     val url = "https://image.tmdb.org/t/p/original${movie.poster_path}"
                     AsyncImage(

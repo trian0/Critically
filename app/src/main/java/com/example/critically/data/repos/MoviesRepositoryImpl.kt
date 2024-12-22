@@ -4,6 +4,7 @@ import com.example.critically.BuildConfig
 import com.example.critically.data.Result
 import com.example.critically.data.api.ApiMovie
 import com.example.critically.models.Movies
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
@@ -18,14 +19,20 @@ class MoviesRepositoryImpl(
             val moviesFromApi = try {
                 apiMovie.getMoviesList(1, BuildConfig.TMDB_API_KEY)
             } catch (e: IOException) {
+                FirebaseCrashlytics.getInstance().recordException(e)
+                FirebaseCrashlytics.getInstance().sendUnsentReports()
                 e.printStackTrace()
                 emit(Result.Error(message = "Error loading movies"))
                 return@flow
             } catch (e: HttpException) {
+                FirebaseCrashlytics.getInstance().recordException(e)
+                FirebaseCrashlytics.getInstance().sendUnsentReports()
                 e.printStackTrace()
                 emit(Result.Error(message = "Error loading movies"))
                 return@flow
             } catch (e: Exception) {
+                FirebaseCrashlytics.getInstance().recordException(e)
+                FirebaseCrashlytics.getInstance().sendUnsentReports()
                 e.printStackTrace()
                 emit(Result.Error(message = "Error loading movies"))
                 return@flow
@@ -40,14 +47,20 @@ class MoviesRepositoryImpl(
             val moviesSearched = try {
                 apiMovie.getSearchMoviesList(movieName.value, BuildConfig.TMDB_API_KEY)
             } catch (e: IOException) {
+                FirebaseCrashlytics.getInstance().recordException(e)
+                FirebaseCrashlytics.getInstance().sendUnsentReports()
                 e.printStackTrace()
                 emit(Result.Error(message = "Error loading movies"))
                 return@flow
             } catch (e: HttpException) {
+                FirebaseCrashlytics.getInstance().recordException(e)
+                FirebaseCrashlytics.getInstance().sendUnsentReports()
                 e.printStackTrace()
                 emit(Result.Error(message = "Error loading movies"))
                 return@flow
             } catch (e: Exception) {
+                FirebaseCrashlytics.getInstance().recordException(e)
+                FirebaseCrashlytics.getInstance().sendUnsentReports()
                 e.printStackTrace()
                 emit(Result.Error(message = "Error loading movies"))
                 return@flow

@@ -9,8 +9,9 @@ import androidx.compose.ui.graphics.Color
 import com.example.critically.navigation.PostOfficeAppRouter
 import com.example.critically.navigation.Screen
 import com.example.critically.screens.BottomNavigation
-import com.example.critically.screens.SignUpScreen
 import com.example.critically.screens.LoginScreen
+import com.example.critically.screens.MovieDetailScreen
+import com.example.critically.screens.SignUpScreen
 
 @Composable
 fun PostOfficeApp() {
@@ -19,12 +20,15 @@ fun PostOfficeApp() {
         color = Color.White
     ) {
         Crossfade(targetState = PostOfficeAppRouter.currentScreen, label = "") { currentState ->
-            when(currentState.value) {
+            when (currentState.value) {
                 Screen.LoginScreen -> LoginScreen()
                 Screen.SignUpScreen -> SignUpScreen()
                 Screen.BottomNavigation -> BottomNavigation()
+                is Screen.MovieDetailScreen -> {
+                    val movie = (currentState.value as Screen.MovieDetailScreen).movie
+                    MovieDetailScreen(movie = movie)
+                }
             }
-
         }
     }
 }

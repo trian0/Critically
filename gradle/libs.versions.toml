@@ -34,6 +34,8 @@ viewModel = "2.8.7"
 coroutines = "1.9.0"
 compose = "1.7.6"
 accompanist = "0.30.1"
+firebase-crashlytics = "18.4.1"
+firebase-analytics = "21.4.0"
 
 [libraries]
 androidx-compose-bom-v20240202 = { module = "androidx.compose:compose-bom", version.ref = "androidxComposeBom" }
@@ -52,7 +54,6 @@ androidx-navigation-compose = { module = "androidx.navigation:navigation-compose
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 dotenv-kotlin = { module = "io.github.cdimascio:dotenv-kotlin", version.ref = "dotenvKotlin" }
-firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
@@ -91,6 +92,8 @@ compose-ui-util = { group = "androidx.compose.ui", name = "ui-util", version.ref
 accompanist-pager = { group = "com.google.accompanist", name = "accompanist-pager", version.ref = "accompanist" }
 accompanist-pager-indicators = { group = "com.google.accompanist", name = "accompanist-pager-indicators", version.ref = "accompanist" }
 compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "compose" }
+firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics-ktx", version.ref = "firebase-crashlytics" }
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics-ktx", version.ref = "firebase-analytics" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

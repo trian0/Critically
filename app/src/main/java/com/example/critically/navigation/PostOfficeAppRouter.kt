@@ -2,12 +2,14 @@ package com.example.critically.navigation
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import com.example.critically.models.Movies
 import com.google.firebase.auth.FirebaseAuth
 
 sealed class Screen() {
     data object LoginScreen : Screen()
     data object SignUpScreen : Screen()
     data object BottomNavigation : Screen()
+    data class MovieDetailScreen(val movie: Movies) : Screen()
 }
 
 object PostOfficeAppRouter {

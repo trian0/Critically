@@ -2,7 +2,7 @@
   "project_info": {
     "project_number": "830469166820",
     "project_id": "study-cbf60",
-    "storage_bucket": "study-cbf60.appspot.com"
+    "storage_bucket": "study-cbf60.firebasestorage.app"
   },
   "client": [
     {
@@ -22,8 +22,12 @@
           }
         },
         {
-          "client_id": "830469166820-ct2mp7r44rpkl13uou0sfpdmq9odqeip.apps.googleusercontent.com",
-          "client_type": 3
+          "client_id": "830469166820-kf2c5arllg27qj3k7m0b72knhll3bc7c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.critically",
+            "certificate_hash": "f0ec2b25b377657334fd7d4bc24971434c6d5bc9"
+          }
         }
       ],
       "api_key": [
@@ -35,7 +39,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "830469166820-ct2mp7r44rpkl13uou0sfpdmq9odqeip.apps.googleusercontent.com",
+              "client_id": "830469166820-qhvppc1jdkms3j7dh6ivfvpe40nc3o0d.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

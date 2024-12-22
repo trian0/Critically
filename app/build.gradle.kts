@@ -4,6 +4,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -46,10 +47,15 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
+            isDebuggable = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            firebaseCrashlytics {
+                mappingFileUploadEnabled = true
+            }
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
@@ -117,4 +123,6 @@ dependencies {
     implementation(libs.accompanist.pager)
     implementation(libs.accompanist.pager.indicators)
     implementation(libs.compose.foundation)
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.analytics)
 }

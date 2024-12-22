@@ -7,6 +7,7 @@ import com.example.critically.data.rules.Validator
 import com.example.critically.navigation.PostOfficeAppRouter
 import com.example.critically.navigation.Screen
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 class LoginViewModel : ViewModel() {
 
@@ -90,6 +91,8 @@ class LoginViewModel : ViewModel() {
                     showErrorAlertDialog.value = true
                 }
         } catch (e: Exception) {
+            FirebaseCrashlytics.getInstance().recordException(e)
+            FirebaseCrashlytics.getInstance().sendUnsentReports()
             e.printStackTrace()
         }
     }

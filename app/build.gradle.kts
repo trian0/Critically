@@ -46,6 +46,9 @@ android {
 
     buildTypes {
         release {
+            val properties = Properties()
+            properties.load(project.rootProject.file("local.properties").inputStream())
+
             isMinifyEnabled = true
             isDebuggable = true
             proguardFiles(
@@ -56,6 +59,22 @@ android {
                 mappingFileUploadEnabled = true
             }
             signingConfig = signingConfigs.getByName("debug")
+            buildConfigField(
+                "String",
+                "CLIENT_API",
+                "\"${properties.getProperty("CLIENT_API")}\""
+            )
+            buildConfigField(
+                "String",
+                "TMDB_API_KEY",
+                "\"${properties.getProperty("TMDB_API_KEY")}\""
+
+            )
+            buildConfigField(
+                "String",
+                "GOOGLE_BOOKS_API_KEY",
+                "\"${properties.getProperty("GOOGLE_BOOKS_API_KEY")}\""
+            )
         }
     }
     compileOptions {

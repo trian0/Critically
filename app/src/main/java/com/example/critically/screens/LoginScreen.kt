@@ -106,7 +106,6 @@ fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
                 onButtonClicked = {
                     scope.launch {
                         val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
-                            .setFilterByAuthorizedAccounts(true)
                             .setFilterByAuthorizedAccounts(false)
                             .setServerClientId(clientApi)
                             .build()

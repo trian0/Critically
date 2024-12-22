@@ -9,7 +9,6 @@ interface ApiBooks {
     @GET("volumes")
     suspend fun getBooksList(
         @Query("q") book: String,
-
     ): BookResponse
 
     companion object {

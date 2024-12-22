@@ -14,7 +14,6 @@ class BooksRepositoryImpl(
     private val apiBook: ApiBooks
 ) : BooksRepository {
     override suspend fun getSearchedBooksList(bookName: StateFlow<String>): Flow<Result<List<Item>>> {
-        apiBook.getBooksList(bookName.value)
         return flow {
             val booksFromApi = try {
                 apiBook.getBooksList(bookName.value)

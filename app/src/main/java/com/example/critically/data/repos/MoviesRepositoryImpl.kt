@@ -3,6 +3,7 @@ package com.example.critically.data.repos
 import com.example.critically.BuildConfig
 import com.example.critically.data.Result
 import com.example.critically.data.api.ApiMovie
+import com.example.critically.models.Backdrop
 import com.example.critically.models.Movies
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.flow.Flow
@@ -42,10 +43,10 @@ class MoviesRepositoryImpl(
         }
     }
 
-    override suspend fun getSearchedMoviesList(movieName: StateFlow<String>): Flow<Result<List<Movies>>> {
+    override suspend fun getSearchedMoviesList(movieName: StateFlow<String>, language: String): Flow<Result<List<Movies>>> {
         return flow {
             val moviesSearched = try {
-                apiMovie.getSearchMoviesList(movieName.value, BuildConfig.TMDB_API_KEY)
+                apiMovie.getSearchMoviesList(movieName.value, BuildConfig.TMDB_API_KEY, language)
             } catch (e: IOException) {
                 FirebaseCrashlytics.getInstance().recordException(e)
                 FirebaseCrashlytics.getInstance().sendUnsentReports()
@@ -67,6 +68,34 @@ class MoviesRepositoryImpl(
             }
 
             emit(Result.Success(moviesSearched.results))
+        }
+    }
+
+    override suspend fun getMovieImages(movieId: Int): Flow<Result<ArrayList<Backdrop>>> {
+        return flow {
+            val moviesSearched = try {
+                apiMovie.getMovieImages(movieId)
+            } catch (e: IOException) {
+                FirebaseCrashlytics.getInstance().recordException(e)
+                FirebaseCrashlytics.getInstance().sendUnsentReports()
+                e.printStackTrace()
+                emit(Result.Error(message = "Error loading movie's image"))
+                return@flow
+            } catch (e: HttpException) {
+                FirebaseCrashlytics.getInstance().recordException(e)
+                FirebaseCrashlytics.getInstance().sendUnsentReports()
+                e.printStackTrace()
+                emit(Result.Error(message = "Error loading movie's image"))
+                return@flow
+            } catch (e: Exception) {
+                FirebaseCrashlytics.getInstance().recordException(e)
+                FirebaseCrashlytics.getInstance().sendUnsentReports()
+                e.printStackTrace()
+                emit(Result.Error(message = "Error loading movie's image"))
+                return@flow
+            }
+
+            emit(Result.Success(moviesSearched.backdrops))
         }
     }
 }

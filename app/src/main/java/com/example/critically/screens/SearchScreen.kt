@@ -112,6 +112,8 @@ fun SearchScreen() {
         val isSearching = searchViewModel.isSearching.collectAsState().value
         val context = LocalContext.current
 
+        val language = stringResource(R.string.language)
+
         LaunchedEffect(key1 = searchViewModel.showErrorToastChannel) {
             searchViewModel.showErrorToastChannel.collectLatest { show ->
                 if (show) {
@@ -156,7 +158,7 @@ fun SearchScreen() {
                                             CoroutineScope(Dispatchers.Main).launch {
                                                 delay(300)
                                                 if (filterMovies) {
-                                                    searchViewModel.searchMovie(it)
+                                                    searchViewModel.searchMovie(it, language)
                                                 } else {
                                                     searchViewModel.searchBook(it)
                                                 }

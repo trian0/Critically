@@ -35,4 +35,6 @@
     <string name="search_movies">Filmes</string>
     <string name="search_books">Livros</string>
     <string name="btn_login_google">Continue com o google</string>
+    <string name="language">pt-BR</string>
+    <string name="about">Sobre</string>
 </resources>

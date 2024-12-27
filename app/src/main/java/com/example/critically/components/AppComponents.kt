@@ -3,19 +3,27 @@ package com.example.critically.components
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
@@ -45,8 +53,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -70,6 +80,7 @@ import androidx.compose.ui.unit.sp
 import com.example.critically.R
 import com.example.critically.ui.theme.BgColor
 import com.example.critically.ui.theme.GrayColor
+import com.example.critically.ui.theme.GrayStar
 import com.example.critically.ui.theme.Primary
 import com.example.critically.ui.theme.Secondary
 import com.example.critically.ui.theme.TextColor
@@ -494,6 +505,67 @@ fun ButtonExtensionsLogin(onButtonClicked: () -> Unit, image: Painter, text: Str
                 modifier = Modifier
                     .weight(1f)
             )
+        }
+    }
+}
+
+@Composable
+fun RatingItem(rating: Double) {
+
+    val color = when (rating) {
+        in 0.0..4.0 -> Color.Red
+        in 4.1..7.0 -> Color.Yellow
+        else -> Color.Green
+    }
+
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(4.dp))
+            .background(color, shape = RectangleShape),
+    ) {
+        Text(
+            text = String.format("%.1f", rating),
+            color = Color.White,
+            modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp)
+        )
+    }
+}
+
+@Composable
+fun StarRatingBar(
+    maxStars: Int = 5,
+    rating: Float,
+    onRatingChanged: (Float) -> Unit
+) {
+    val density = LocalDensity.current.density
+    val starSize = (8f * density).dp
+    val starSpacing = (0.5f * density).dp
+
+    Row(
+        modifier = Modifier.selectableGroup(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        for (i in 1..maxStars) {
+            val isSelected = i <= rating
+            val icon = if (isSelected) Icons.Filled.Star else Icons.Default.Star
+            val iconTintColor = if (isSelected) Primary else GrayStar
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = iconTintColor,
+                modifier = Modifier
+                    .selectable(
+                        selected = isSelected,
+                        onClick = {
+                            onRatingChanged(i.toFloat())
+                        }
+                    )
+                    .width(starSize).height(starSize)
+            )
+
+            if (i < maxStars) {
+                Spacer(modifier = Modifier.width(starSpacing))
+            }
         }
     }
 }

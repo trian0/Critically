@@ -42,6 +42,11 @@ android {
             "GOOGLE_BOOKS_API_KEY",
             "\"${properties.getProperty("GOOGLE_BOOKS_API_KEY")}\""
         )
+        buildConfigField(
+            "String",
+            "AUTH_API_KEY",
+            "\"${properties.getProperty("AUTH_API_KEY")}\""
+        )
     }
 
     buildTypes {
@@ -74,6 +79,11 @@ android {
                 "String",
                 "GOOGLE_BOOKS_API_KEY",
                 "\"${properties.getProperty("GOOGLE_BOOKS_API_KEY")}\""
+            )
+            buildConfigField(
+                "String",
+                "AUTH_API_KEY",
+                "\"${properties.getProperty("AUTH_API_KEY")}\""
             )
         }
     }

@@ -11,6 +11,7 @@ import com.example.critically.navigation.Screen
 import com.example.critically.screens.BottomNavigation
 import com.example.critically.screens.LoginScreen
 import com.example.critically.screens.MovieDetailScreen
+import com.example.critically.screens.SearchScreen
 import com.example.critically.screens.SignUpScreen
 
 @Composable
@@ -28,6 +29,7 @@ fun PostOfficeApp() {
                     val movie = (currentState.value as Screen.MovieDetailScreen).movie
                     MovieDetailScreen(movie = movie)
                 }
+                Screen.Searchscreen -> SearchScreen()
             }
         }
     }

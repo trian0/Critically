@@ -1,7 +1,11 @@
 package com.example.critically.data.api
 
+import com.example.critically.BuildConfig
+import com.example.critically.models.MovieImage
 import com.example.critically.models.MoviesResponse
 import retrofit2.http.GET
+import retrofit2.http.Header
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiMovie {
@@ -16,7 +20,14 @@ interface ApiMovie {
     suspend fun getSearchMoviesList(
         @Query("query") query: String,
         @Query("api_key") apiKey: String,
+        @Query("language") language: String = "pt-BR"
     ): MoviesResponse
+
+    @GET("movie/{movie_id}/images")
+    suspend fun getMovieImages(
+        @Path("movie_id") movieId: Int,
+        @Header("Authorization") apiKey: String = "Bearer ${BuildConfig.AUTH_API_KEY}"
+    ): MovieImage
 
     companion object {
         const val BASE_URL = "https://api.themoviedb.org/3/"

@@ -34,4 +34,6 @@
     <string name="search_movies">Movies</string>
     <string name="search_books">Books</string>
     <string name="btn_login_google">Continue with Google</string>
+    <string name="language">en-US</string>
+    <string name="about">About</string>
 </resources>

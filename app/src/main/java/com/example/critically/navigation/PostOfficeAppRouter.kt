@@ -9,6 +9,7 @@ sealed class Screen() {
     data object LoginScreen : Screen()
     data object SignUpScreen : Screen()
     data object BottomNavigation : Screen()
+    data object Searchscreen : Screen()
     data class MovieDetailScreen(val movie: Movies) : Screen()
 }
 
@@ -18,7 +19,16 @@ object PostOfficeAppRouter {
     val currentScreen: MutableState<Screen> = if (auth.currentUser != null)
         mutableStateOf(Screen.BottomNavigation) else mutableStateOf(Screen.LoginScreen)
 
+    private val screenHistory: MutableList<Screen> = mutableListOf(currentScreen.value)
+
     fun navigateTo(destination: Screen) {
         currentScreen.value = destination
+        screenHistory.add(destination)
+    }
+    fun navigateBack() {
+        if (screenHistory.size > 1) {
+            screenHistory.removeAt(screenHistory.size - 1)
+            currentScreen.value = screenHistory.last()
+        }
     }
 }

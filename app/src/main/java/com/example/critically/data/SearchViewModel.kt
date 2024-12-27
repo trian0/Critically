@@ -34,13 +34,13 @@ class SearchViewModel(
     private val _searchText = MutableStateFlow("")
     val searchText = _searchText.asStateFlow()
 
-    fun searchMovie(text: String) {
+    fun searchMovie(text: String, language: String = "en-US") {
         if (text.isNotEmpty()) {
             _searchText.value = text
             _isSearching.value = true
 
             viewModelScope.launch {
-                moviesRepository.getSearchedMoviesList(searchText).collectLatest { result ->
+                moviesRepository.getSearchedMoviesList(searchText, language).collectLatest { result ->
                     when(result) {
                         is Result.Error -> {
                             _showErrorToastChannel.send(true)

@@ -34,8 +34,9 @@ viewModel = "2.8.7"
 coroutines = "1.9.0"
 compose = "1.7.6"
 accompanist = "0.30.1"
-firebase-crashlytics = "18.4.1"
-firebase-analytics = "21.4.0"
+firebase-crashlytics = "19.3.0"
+firebase-analytics = "22.1.2"
+systemUiController = "0.30.1"
 
 [libraries]
 androidx-compose-bom-v20240202 = { module = "androidx.compose:compose-bom", version.ref = "androidxComposeBom" }

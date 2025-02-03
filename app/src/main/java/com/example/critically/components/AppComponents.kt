@@ -82,6 +82,7 @@ import com.example.critically.ui.theme.BgColor
 import com.example.critically.ui.theme.GrayColor
 import com.example.critically.ui.theme.GrayStar
 import com.example.critically.ui.theme.Primary
+import com.example.critically.ui.theme.RatingColor
 import com.example.critically.ui.theme.Secondary
 import com.example.critically.ui.theme.TextColor
 import com.example.critically.ui.theme.componentShapes
@@ -515,7 +516,7 @@ fun RatingItem(rating: Double) {
     val color = when (rating) {
         in 0.0..4.0 -> Color.Red
         in 4.1..7.0 -> Color.Yellow
-        else -> Color.Green
+        else -> RatingColor
     }
 
     Box(
@@ -525,7 +526,7 @@ fun RatingItem(rating: Double) {
     ) {
         Text(
             text = String.format("%.1f", rating),
-            color = Color.White,
+            color = Color.Gray,
             modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp)
         )
     }

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.critically.data.repos.MoviesRepository
 import com.example.critically.models.Backdrop
+import com.example.critically.models.Cast
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,13 +20,19 @@ class MovieDetailViewModel(
     private val _images = MutableStateFlow<ArrayList<Backdrop>>(ArrayList())
     val images = _images.asStateFlow()
 
+    private val _cast = MutableStateFlow<ArrayList<Cast>>(ArrayList())
+    val cast = _cast.asStateFlow()
+
+    private val _duration = MutableStateFlow<Int>(0)
+    val duration = _duration.asStateFlow()
+
     private val _showErrorToastChannel = Channel<Boolean>()
     val showErrorToastChannel = _showErrorToastChannel.receiveAsFlow()
 
     private val _isSearching = MutableStateFlow(false)
     val isSearching = _isSearching.asStateFlow()
 
-    fun getMovieImage(movieId: Int) {
+    fun getMovieInfo(movieId: Int) {
         if (movieId > 0) {
             _isSearching.value = true
 
@@ -44,6 +51,39 @@ class MovieDetailViewModel(
                             }
                         }
                     }
+                }
+
+                moviesRepository.getMovieCredits(movieId).collectLatest { result ->
+                    when(result) {
+                        is Result.Error -> {
+                            _showErrorToastChannel.send(true)
+                            _isSearching.value = false
+                        }
+
+                        is Result.Success -> {
+                            result.data?.let { cast ->
+                                _cast.update { cast }
+                                _isSearching.value = false
+                            }
+                        }
+                    }
+                }
+
+                moviesRepository.getMovieDetails(movieId).collectLatest { result ->
+                    when(result) {
+                        is Result.Error -> {
+                            _showErrorToastChannel.send(true)
+                            _isSearching.value = false
+                        }
+
+                        is Result.Success -> {
+                            result.data?.let { runtime ->
+                                _duration.update { runtime }
+                                _isSearching.value = false
+                            }
+                        }
+                    }
+
                 }
             }
             return

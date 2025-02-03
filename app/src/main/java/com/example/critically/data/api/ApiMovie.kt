@@ -1,6 +1,8 @@
 package com.example.critically.data.api
 
 import com.example.critically.BuildConfig
+import com.example.critically.models.MovieCredits
+import com.example.critically.models.MovieDetails
 import com.example.critically.models.MovieImage
 import com.example.critically.models.MoviesResponse
 import retrofit2.http.GET
@@ -28,6 +30,18 @@ interface ApiMovie {
         @Path("movie_id") movieId: Int,
         @Header("Authorization") apiKey: String = "Bearer ${BuildConfig.AUTH_API_KEY}"
     ): MovieImage
+
+    @GET("movie/{movie_id}/credits")
+    suspend fun getMovieCredits(
+        @Path("movie_id") movieId: Int,
+        @Header("Authorization") apiKey: String = "Bearer ${BuildConfig.AUTH_API_KEY}"
+    ): MovieCredits
+
+    @GET("movie/{movie_id}")
+    suspend fun getMovieDetails(
+        @Path("movie_id") movieId: Int,
+        @Header("Authorization") apiKey: String = "Bearer ${BuildConfig.AUTH_API_KEY}"
+    ): MovieDetails
 
     companion object {
         const val BASE_URL = "https://api.themoviedb.org/3/"

@@ -28,7 +28,7 @@
     <string name="email_error_message">Fill in the field correctly</string>
     <string name="privacy_policy_error_message">Acceptance of the terms of service is required</string>
     <string name="error">Error!</string>
-    <string name="empty_list_message">Nothing found.</string>
+    <string name="empty_list_message">Try a different search</string>
     <string name="release_date_not_informed">Not informed</string>
     <string name="see_more">See More</string>
     <string name="search_movies">Movies</string>
@@ -36,4 +36,9 @@
     <string name="btn_login_google">Continue with Google</string>
     <string name="language">en-US</string>
     <string name="about">About</string>
+    <string name="duration_text">%s min.</string>
+    <string name="duration">Duration</string>
+    <string name="rating">Rating</string>
+    <string name="release">Release</string>
+    <string name="cast">Cast</string>
 </resources>

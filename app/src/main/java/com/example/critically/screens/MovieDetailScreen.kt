@@ -1,8 +1,8 @@
 package com.example.critically.screens
 
-import android.widget.Space
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -16,12 +16,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.outlined.AccessTime
+import androidx.compose.material.icons.outlined.RocketLaunch
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,11 +38,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,17 +59,12 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.critically.R
 import com.example.critically.RetrofitInstance
-import com.example.critically.components.DividerTextComponent
-import com.example.critically.components.RatingItem
-import com.example.critically.components.StarRatingBar
 import com.example.critically.data.MovieDetailViewModel
 import com.example.critically.data.repos.MoviesRepositoryImpl
 import com.example.critically.models.Movies
 import com.example.critically.navigation.PostOfficeAppRouter
 import com.example.critically.navigation.Screen
 import com.example.critically.ui.theme.BgCardColor
-import com.example.critically.ui.theme.BgColor
-import com.example.critically.ui.theme.GrayColor
 import com.example.critically.ui.theme.Primary
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -84,13 +83,15 @@ fun MovieDetailScreen(modifier: Modifier = Modifier, movie: Movies) {
         })
 
     val images = movieDetailViewModel.images.collectAsState().value
+    val cast = movieDetailViewModel.cast.collectAsState().value
+    val duration = movieDetailViewModel.duration.collectAsState().value
     val isSearching = movieDetailViewModel.isSearching.collectAsState().value
     val context = LocalContext.current
-    var rating by remember { mutableFloatStateOf(1f) }
+    val scrollState = rememberScrollState()
 
     LaunchedEffect(Unit) {
         CoroutineScope(Dispatchers.Main).launch {
-            movieDetailViewModel.getMovieImage(movie.id)
+            movieDetailViewModel.getMovieInfo(movie.id)
         }
     }
 
@@ -170,37 +171,36 @@ fun MovieDetailScreen(modifier: Modifier = Modifier, movie: Movies) {
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
                             .offset(y = (-20).dp)
-                            .padding(horizontal = 5.dp),
+                            .padding(start = 5.dp, end = 5.dp, bottom = 15.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
                         Text(
+                            modifier = Modifier
+                                .padding(horizontal = 60.dp)
+                                .width(200.dp),
                             text = movie.title,
                             color = Color.White,
                             fontWeight = FontWeight.Bold,
                             fontSize = 24.sp,
                             textAlign = TextAlign.Center
                         )
+                    }
 
-                        Row(
-                            modifier = Modifier
-                                .padding(top = 10.dp)
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            RatingItem(movie.vote_average)
-                            Spacer(Modifier.width(5.dp))
-                            Divider(
-                                modifier = Modifier
-                                    .width(1.dp)
-                                    .height(20.dp),
-                                color = GrayColor,
-                                thickness = 1.dp
-                            )
-                            Spacer(Modifier.width(5.dp))
-                            Text(text = movie.release_date.split("-")[0], color = Color.Gray)
-                        }
+                    IconButton(
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(16.dp)
+                            .offset(y = (-20).dp)
+                            .zIndex(1f)
+                            .border(2.dp, Color.White, CircleShape),
+                        onClick = { }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Add,
+                            contentDescription = "",
+                            tint = Color.White
+                        )
                     }
                 }
             }
@@ -210,25 +210,142 @@ fun MovieDetailScreen(modifier: Modifier = Modifier, movie: Movies) {
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight(0.45f)
+                .clip(RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp))
                 .align(Alignment.BottomCenter)
                 .background(Color.White)
+                .verticalScroll(scrollState)
         ) {
             Column {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 10.dp, end = 10.dp, top = 10.dp)
+                        .padding(10.dp)
                         .clip(RoundedCornerShape(16.dp))
                         .background(BgCardColor)
                 ) {
                     Column(
                         modifier = Modifier.padding(20.dp)
                     ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .background(Color.White, CircleShape)
+                                        .border(
+                                            BorderStroke(2.dp, Primary),
+                                            CircleShape
+                                        )
+                                        .padding(8.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Outlined.AccessTime,
+                                        contentDescription = "",
+                                        tint = Primary,
+                                        modifier = Modifier.background(Color.White, CircleShape)
+                                    )
+                                }
+                                Spacer(Modifier.width(5.dp))
+                                Column {
+                                    Text(
+                                        text = stringResource(
+                                            R.string.duration_text,
+                                            duration.toString()
+                                        ),
+                                        color = Color.Black,
+                                        fontSize = 15.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        textAlign = TextAlign.Center
+                                    )
+                                    Text(
+                                        text = stringResource(R.string.duration),
+                                        color = Color.Gray,
+                                        fontSize = 15.sp
+                                    )
+                                }
+                            }
+                            Spacer(Modifier.width(10.dp))
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .background(Color.White, CircleShape)
+                                        .border(
+                                            BorderStroke(2.dp, Primary),
+                                            CircleShape
+                                        )
+                                        .padding(8.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Outlined.Star,
+                                        contentDescription = "",
+                                        tint = Primary,
+                                        modifier = Modifier.background(Color.White, CircleShape)
+                                    )
+                                }
+                                Spacer(Modifier.width(5.dp))
+                                Column {
+                                    Text(
+                                        text = String.format("%.1f", movie.vote_average),
+                                        color = Color.Black,
+                                        fontSize = 15.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        textAlign = TextAlign.Center
+                                    )
+                                    Text(
+                                        text = stringResource(R.string.rating),
+                                        color = Color.Gray,
+                                        fontSize = 15.sp
+                                    )
+                                }
+                            }
+                            Spacer(Modifier.width(10.dp))
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .background(Color.White, CircleShape)
+                                        .border(
+                                            BorderStroke(2.dp, Primary),
+                                            CircleShape
+                                        )
+                                        .padding(8.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Outlined.RocketLaunch,
+                                        contentDescription = "",
+                                        tint = Primary,
+                                        modifier = Modifier.background(Color.White, CircleShape)
+                                    )
+                                }
+                                Spacer(Modifier.width(5.dp))
+                                Column {
+                                    Text(
+                                        text = movie.release_date.split("-")[0],
+                                        color = Color.Black,
+                                        fontSize = 15.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        textAlign = TextAlign.Center
+                                    )
+                                    Text(
+                                        text = stringResource(R.string.release),
+                                        color = Color.Gray,
+                                        fontSize = 15.sp
+                                    )
+                                }
+                            }
+                        }
+                        Spacer(Modifier.height(15.dp))
                         Text(
                             text = stringResource(R.string.about),
                             color = Primary,
                             fontSize = 15.sp,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Justify
                         )
                         Spacer(Modifier.height(15.dp))
                         Text(
@@ -238,24 +355,52 @@ fun MovieDetailScreen(modifier: Modifier = Modifier, movie: Movies) {
                             fontWeight = FontWeight.Bold
                         )
                     }
-                }
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 10.dp, end = 10.dp, top = 10.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(BgCardColor)
-                ) {
-                    Row(
-                        modifier = Modifier.padding(20.dp)
+
+                    Column(
+                        modifier = Modifier.padding(start = 20.dp, bottom = 10.dp)
                     ) {
-                        StarRatingBar(
-                            maxStars = 5,
-                            rating = rating,
-                            onRatingChanged = {
-                                rating = it
-                            }
+                        Text(
+                            text = stringResource(R.string.cast),
+                            color = Primary,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Justify
                         )
+                        Spacer(Modifier.height(15.dp))
+                        LazyRow {
+                            items(cast) { cast ->
+                                val imageUrl =
+                                    "https://image.tmdb.org/t/p/original${cast.profile_path}"
+                                Row(
+                                    horizontalArrangement = Arrangement.Center,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    AsyncImage(
+                                        modifier = Modifier
+                                            .size(50.dp)
+                                            .clip(RoundedCornerShape(10.dp)),
+                                        model = ImageRequest.Builder(LocalContext.current)
+                                            .data(imageUrl)
+                                            .crossfade(true)
+                                            .build(),
+                                        contentScale = ContentScale.Crop,
+                                        contentDescription = "",
+                                        placeholder = painterResource(id = R.drawable.placeholder),
+                                        error = painterResource(id = R.drawable.error_image_generic)
+                                    )
+
+                                    val formattedName = cast.name.replace(" ", "\n")
+
+                                    Text(
+                                        modifier = Modifier.padding(horizontal = 10.dp),
+                                        text = formattedName,
+                                        color = Color.Black,
+                                        textAlign = TextAlign.Center,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }

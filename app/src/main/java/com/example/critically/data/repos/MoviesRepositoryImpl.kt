@@ -4,6 +4,7 @@ import com.example.critically.BuildConfig
 import com.example.critically.data.Result
 import com.example.critically.data.api.ApiMovie
 import com.example.critically.models.Backdrop
+import com.example.critically.models.Cast
 import com.example.critically.models.Movies
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.flow.Flow
@@ -96,6 +97,62 @@ class MoviesRepositoryImpl(
             }
 
             emit(Result.Success(moviesSearched.backdrops))
+        }
+    }
+
+    override suspend fun getMovieCredits(movieId: Int): Flow<Result<ArrayList<Cast>>> {
+        return flow {
+            val moviesSearched = try {
+                apiMovie.getMovieCredits(movieId)
+            } catch (e: IOException) {
+                FirebaseCrashlytics.getInstance().recordException(e)
+                FirebaseCrashlytics.getInstance().sendUnsentReports()
+                e.printStackTrace()
+                emit(Result.Error(message = "Error loading movie's credits"))
+                return@flow
+            } catch (e: HttpException) {
+                FirebaseCrashlytics.getInstance().recordException(e)
+                FirebaseCrashlytics.getInstance().sendUnsentReports()
+                e.printStackTrace()
+                emit(Result.Error(message = "Error loading movie's credits"))
+                return@flow
+            } catch (e: Exception) {
+                FirebaseCrashlytics.getInstance().recordException(e)
+                FirebaseCrashlytics.getInstance().sendUnsentReports()
+                e.printStackTrace()
+                emit(Result.Error(message = "Error loading movie's credits"))
+                return@flow
+            }
+
+            emit(Result.Success(moviesSearched.cast))
+        }
+    }
+
+    override suspend fun getMovieDetails(movieId: Int): Flow<Result<Int>> {
+        return flow {
+            val moviesSearched = try {
+                apiMovie.getMovieDetails(movieId)
+            } catch (e: IOException) {
+                FirebaseCrashlytics.getInstance().recordException(e)
+                FirebaseCrashlytics.getInstance().sendUnsentReports()
+                e.printStackTrace()
+                emit(Result.Error(message = "Error loading movie's credits"))
+                return@flow
+            } catch (e: HttpException) {
+                FirebaseCrashlytics.getInstance().recordException(e)
+                FirebaseCrashlytics.getInstance().sendUnsentReports()
+                e.printStackTrace()
+                emit(Result.Error(message = "Error loading movie's credits"))
+                return@flow
+            } catch (e: Exception) {
+                FirebaseCrashlytics.getInstance().recordException(e)
+                FirebaseCrashlytics.getInstance().sendUnsentReports()
+                e.printStackTrace()
+                emit(Result.Error(message = "Error loading movie's credits"))
+                return@flow
+            }
+
+            emit(Result.Success(moviesSearched.runtime))
         }
     }
 }

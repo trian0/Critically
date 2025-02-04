@@ -8,17 +8,18 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -29,8 +30,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.outlined.AccessTime
+import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.RocketLaunch
 import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -45,6 +50,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -219,7 +225,7 @@ fun MovieDetailScreen(modifier: Modifier = Modifier, movie: Movies) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(10.dp)
+                        .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 90.dp)
                         .clip(RoundedCornerShape(16.dp))
                         .background(BgCardColor)
                 ) {
@@ -352,12 +358,13 @@ fun MovieDetailScreen(modifier: Modifier = Modifier, movie: Movies) {
                             text = movie.overview,
                             color = Color.Black,
                             fontSize = 15.sp,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Justify
                         )
                     }
 
                     Column(
-                        modifier = Modifier.padding(start = 20.dp, bottom = 10.dp)
+                        modifier = Modifier.padding(start = 20.dp, bottom = 10.dp, end = 20.dp)
                     ) {
                         Text(
                             text = stringResource(R.string.cast),
@@ -402,6 +409,63 @@ fun MovieDetailScreen(modifier: Modifier = Modifier, movie: Movies) {
                             }
                         }
                     }
+                }
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+                .height(80.dp)
+                .clip(RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp))
+                .padding(horizontal = 10.dp)
+                .zIndex(1f)
+                .background(Color.White),
+            contentAlignment = Alignment.Center
+        ) {
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.Center)) {
+                Button(
+                    onClick = {
+
+                    },
+                    modifier = Modifier
+                        .weight(0.6f)
+                        .padding(end = 4.dp)
+                        .heightIn(48.dp),
+                    contentPadding = PaddingValues(),
+                    colors = ButtonDefaults.buttonColors(Primary),
+                    enabled = true
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .heightIn(48.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.criticize),
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = colorResource(id = R.color.white)
+                        )
+                    }
+                }
+
+                IconButton(
+                    modifier = Modifier
+                        .weight(0.1f)
+                        .border(2.dp, Primary, CircleShape),
+                    onClick = {
+
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.FavoriteBorder,
+                        contentDescription = "",
+                        tint = Primary
+                    )
                 }
             }
         }

@@ -37,6 +37,7 @@ import com.example.critically.components.PasswordTextFieldComponent
 import com.example.critically.components.UnderLinedTextComponent
 import com.example.critically.data.LoginUIEvent
 import com.example.critically.data.LoginViewModel
+import com.example.critically.firebase.FirebaseUtils
 import com.example.critically.navigation.PostOfficeAppRouter
 import com.example.critically.navigation.Screen
 import com.example.critically.ui.theme.Primary
@@ -130,6 +131,7 @@ fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
                             auth.signInWithCredential(firebaseCredential)
                                 .addOnCompleteListener { task ->
                                     if (task.isSuccessful) {
+                                        FirebaseUtils.createGoogleUserInFirestore(Firebase.auth.currentUser)
                                         PostOfficeAppRouter.navigateTo(Screen.BottomNavigation)
                                     }
                                 }

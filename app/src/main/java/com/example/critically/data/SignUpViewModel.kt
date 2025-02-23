@@ -1,13 +1,13 @@
 package com.example.critically.data
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.example.critically.data.rules.ValidationResult
 import com.example.critically.data.rules.Validator
-import com.example.critically.navigation.PostOfficeAppRouter
-import com.example.critically.navigation.Screen
+import com.example.critically.firebase.FirebaseUtils
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuth.AuthStateListener
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 class SignUpViewModel : ViewModel() {
 
@@ -17,26 +17,34 @@ class SignUpViewModel : ViewModel() {
 
     var signUpInProgress = mutableStateOf(false)
 
-    private var firstNameResult = ValidationResult()
-    private var lastNameResult = ValidationResult()
+    var showErrorAlertDialog = mutableStateOf(false)
+
+    var showErrorUserAlertDialog = mutableStateOf(false)
+
+    private var nameResult = ValidationResult()
+    private var usernameResult = ValidationResult()
     private var emailResult = ValidationResult()
     private var passwordResult = ValidationResult()
     private var privacyPolicyResult = ValidationResult()
+    private val TAG = "SignUpViewModel"
 
     fun onEvent(event: SignUpUIEvent) {
+        Log.d(TAG, "onEvent")
+        showErrorAlertDialog.value = false
+        showErrorUserAlertDialog.value = false
         when (event) {
-            is SignUpUIEvent.FirstNameChanged -> {
+            is SignUpUIEvent.NameChanged -> {
                 registrationUIState.value = registrationUIState.value.copy(
-                    firstName = event.firstName
+                    name = event.name
                 )
-                validateFirstName()
+                validateName()
             }
 
-            is SignUpUIEvent.LastNameChanged -> {
+            is SignUpUIEvent.UsernameChanged -> {
                 registrationUIState.value = registrationUIState.value.copy(
-                    lastName = event.lastName
+                    username = "@${event.username}"
                 )
-                validateLastName()
+                validateUsername()
             }
 
             is SignUpUIEvent.EmailChanged -> {
@@ -68,33 +76,40 @@ class SignUpViewModel : ViewModel() {
     }
 
     private fun signUp() {
+        Log.d(TAG, "signUp")
+        showErrorAlertDialog.value = false
         createUserInFirebase(
             email = registrationUIState.value.email,
             password = registrationUIState.value.password,
+            name = registrationUIState.value.name,
+            username = registrationUIState.value.username
         )
     }
 
-    private fun validateFirstName() {
-        firstNameResult = Validator.validateFirstName(
-            firstName = registrationUIState.value.firstName
+    private fun validateName() {
+        Log.d(TAG, "validateFirstName")
+        nameResult = Validator.validateName(
+            name = registrationUIState.value.name
         )
 
         registrationUIState.value = registrationUIState.value.copy(
-            firstNameError = firstNameResult.status
+            nameError = nameResult.status
         )
     }
 
-    private fun validateLastName() {
-        lastNameResult = Validator.validateLastName(
-            lastName = registrationUIState.value.lastName
+    private fun validateUsername() {
+        Log.d(TAG, "validateLastName")
+        usernameResult = Validator.validateUsername(
+            username = registrationUIState.value.username
         )
 
         registrationUIState.value = registrationUIState.value.copy(
-            lastNameError = lastNameResult.status
+            usernameError = usernameResult.status
         )
     }
 
     private fun validateEmail() {
+        Log.d(TAG, "validateEmail")
         emailResult = Validator.validateEmail(
             email = registrationUIState.value.email
         )
@@ -105,6 +120,7 @@ class SignUpViewModel : ViewModel() {
     }
 
     private fun validatePassword() {
+        Log.d(TAG, "validatePassword")
         passwordResult = Validator.validatePassword(
             password = registrationUIState.value.password
         )
@@ -115,6 +131,7 @@ class SignUpViewModel : ViewModel() {
     }
 
     private fun validatePrivacyPolicy() {
+        Log.d(TAG, "validatePrivacyPolicy")
         privacyPolicyResult = Validator.validatePrivacyPolicyAcceptance(
             statusValue = registrationUIState.value.privacyPolicyAccepted
         )
@@ -125,24 +142,53 @@ class SignUpViewModel : ViewModel() {
     }
 
     private fun validateDataWithRules() {
-        allValidationsPassed.value = firstNameResult.status && lastNameResult.status
+        Log.d(TAG, "validateDataWithRules")
+        allValidationsPassed.value = nameResult.status && usernameResult.status
                 && emailResult.status && passwordResult.status && privacyPolicyResult.status
     }
 
-    private fun createUserInFirebase(email: String, password: String) {
+    private fun createUserInFirebase(email: String, password: String, name: String, username: String) {
+        Log.d(TAG, "createUserInFirebase")
         signUpInProgress.value = true
-        FirebaseAuth
-            .getInstance()
-            .createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener {
-                signUpInProgress.value = false
-                if (it.isSuccessful) {
-                    PostOfficeAppRouter.navigateTo(Screen.BottomNavigation)
+        showErrorAlertDialog.value = false
+
+        try {
+            FirebaseAuth
+                .getInstance()
+                .createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        val user = FirebaseAuth.getInstance().currentUser
+                        checkIfUserExistsAndCreateUser(user?.uid, username, name, email)
+                    } else {
+                        Log.e("Auth", "Erro ao criar usuário: ${task.exception?.message}")
+                        signUpInProgress.value = false
+                        showErrorUserAlertDialog.value = true
+                    }
                 }
-            }
-            .addOnFailureListener {
-                signUpInProgress.value = false
-            }
+                .addOnFailureListener {
+                    Log.d(TAG, "createUserInFirebase: ${it.message}")
+                    signUpInProgress.value = false
+                    showErrorUserAlertDialog.value = true
+                }
+        } catch (e: Exception) {
+            FirebaseCrashlytics.getInstance().recordException(e)
+            FirebaseCrashlytics.getInstance().sendUnsentReports()
+            e.printStackTrace()
+            signUpInProgress.value = false
+            showErrorAlertDialog.value = true
+        }
+    }
+
+    private fun checkIfUserExistsAndCreateUser(uid: String?, username: String, name: String, email: String) {
+        if (FirebaseUtils.checkIfUserExists(username)) {
+            Log.e("Firestore", "Username já existe!")
+            signUpInProgress.value = false
+            showErrorAlertDialog.value = true
+        } else {
+            signUpInProgress.value = false
+            FirebaseUtils.createUserInFirestore(uid, username, name, email)
+        }
     }
 
 }

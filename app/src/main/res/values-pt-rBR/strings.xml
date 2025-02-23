@@ -5,8 +5,8 @@
     <string name="create_account">Cria uma Conta</string>
     <string name="welcome">Bem - Vindo</string>
     <string name="email">Email</string>
-    <string name="first_name">Nome</string>
-    <string name="last_name">Sobrenome</string>
+    <string name="nick_name">Nome</string>
+    <string name="user_name">Nome de Usuário</string>
     <string name="password">Senha</string>
     <string name="hide_password">Esconder Senha</string>
     <string name="show_password">Mostrar Senha</string>
@@ -22,6 +22,8 @@
     <string name="forgot_password">Esqueceu sua senha?</string>
     <string name="logout">Sair</string>
     <string name="error_login_message">Usuário ou senha incorreto(a). Tente novamente.</string>
+    <string name="error_register_message">Nome de usuário já existe!</string>
+    <string name="error_user_already_exist_message">Email já usado!</string>
     <string name="try_again">Tente Novamente</string>
     <string name="first_name_error_message">Nome muito curto</string>
     <string name="last_name_error_message">Sobrenome muito curto</string>

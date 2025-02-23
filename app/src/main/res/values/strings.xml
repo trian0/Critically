@@ -3,8 +3,8 @@
     <string name="hello">Hey There,</string>
     <string name="create_account">Create an Account</string>
     <string name="welcome">Welcome Back</string>
-    <string name="first_name">First Name</string>
-    <string name="last_name">Last Name</string>
+    <string name="nick_name">Name</string>
+    <string name="user_name">Username</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="hide_password">Hide Password</string>
@@ -21,6 +21,8 @@
     <string name="forgot_password">Forgot your password?</string>
     <string name="logout">Logout</string>
     <string name="error_login_message">Incorrect username or password. Please try again.</string>
+    <string name="error_register_message">Username already exists!</string>
+    <string name="error_user_already_exist_message">Email already used!</string>
     <string name="try_again">Try Again</string>
     <string name="first_name_error_message">First name too short</string>
     <string name="last_name_error_message">Last name too short</string>

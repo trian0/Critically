@@ -2,15 +2,15 @@ package com.example.critically.data.rules
 
 object Validator {
 
-    fun validateFirstName(firstName: String): ValidationResult {
+    fun validateName(name: String): ValidationResult {
         return ValidationResult(
-            (firstName.isNotEmpty() && firstName.length >= 3)
+            (name.isNotEmpty() && name.length >= 3)
         )
     }
 
-    fun validateLastName(lastName: String): ValidationResult {
+    fun validateUsername(username: String): ValidationResult {
         return ValidationResult(
-            (lastName.isNotEmpty() && lastName.length >= 3)
+            (username.isNotEmpty() && username.length >= 3)
         )
     }
 

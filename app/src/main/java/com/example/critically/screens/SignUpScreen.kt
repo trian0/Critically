@@ -8,8 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,11 +35,15 @@ import com.example.critically.navigation.PostOfficeAppRouter
 import com.example.critically.navigation.Screen
 import com.example.critically.ui.theme.Primary
 import com.example.critically.R
+import com.example.critically.components.ErrorAlertDialog
 
 @Composable
 fun SignUpScreen(
     signUpViewModel: SignUpViewModel = viewModel(),
 ) {
+    val shouldShowUsernameExistDialog = remember { mutableStateOf(false) }
+    val shouldShowUserExistDialog = remember { mutableStateOf(false) }
+
     Box(modifier = Modifier.fillMaxSize().background(Color.White), contentAlignment = Alignment.Center) {
         Column(
             modifier = Modifier
@@ -49,21 +54,21 @@ fun SignUpScreen(
             Spacer(modifier = Modifier.height(20.dp))
 
             MyTextFieldComponent(
-                labelValue = stringResource(id = R.string.first_name),
+                labelValue = stringResource(id = R.string.nick_name),
                 painterResource(id = R.drawable.profile),
                 onTextSelected = {
-                    signUpViewModel.onEvent(SignUpUIEvent.FirstNameChanged(it))
+                    signUpViewModel.onEvent(SignUpUIEvent.NameChanged(it))
                 },
-                errorStatus = signUpViewModel.registrationUIState.value.firstNameError,
+                errorStatus = signUpViewModel.registrationUIState.value.nameError,
                 textError = stringResource(id = R.string.first_name_error_message)
             )
             MyTextFieldComponent(
-                labelValue = stringResource(id = R.string.last_name),
-                painterResource(id = R.drawable.profile),
+                labelValue = stringResource(id = R.string.user_name),
+                painterResource(id = R.drawable.arroba),
                 onTextSelected = {
-                    signUpViewModel.onEvent(SignUpUIEvent.LastNameChanged(it))
+                    signUpViewModel.onEvent(SignUpUIEvent.UsernameChanged(it))
                 },
-                errorStatus = signUpViewModel.registrationUIState.value.lastNameError,
+                errorStatus = signUpViewModel.registrationUIState.value.usernameError,
                 textError = stringResource(id = R.string.last_name_error_message)
             )
             MyTextFieldComponent(
@@ -115,6 +120,24 @@ fun SignUpScreen(
         if (signUpViewModel.signUpInProgress.value) {
             CircularProgressIndicator(color = Primary)
         }
+
+        if (signUpViewModel.showErrorAlertDialog.value) {
+            shouldShowUsernameExistDialog.value = true
+        }
+
+        if (signUpViewModel.showErrorUserAlertDialog.value) {
+            shouldShowUserExistDialog.value = true
+        }
+
+        ErrorAlertDialog(
+            text = stringResource(id = R.string.error_register_message),
+            visibility = shouldShowUsernameExistDialog
+        )
+
+        ErrorAlertDialog(
+            text = stringResource(id = R.string.error_user_already_exist_message),
+            visibility = shouldShowUserExistDialog
+        )
     }
 }
 
